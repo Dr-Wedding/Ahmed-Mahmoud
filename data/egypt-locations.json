@@ -1,0 +1,290 @@
+{
+  "locations": [
+    {
+      "id": "cairo",
+      "name": "القاهرة",
+      "cities": [
+        { "id": "cairo-nasr-city", "name": "مدينة نصر" },
+        { "id": "cairo-maadi", "name": "المعادي" },
+        { "id": "cairo-heliopolis", "name": "مصر الجديدة" },
+        { "id": "cairo-new-cairo", "name": "القاهرة الجديدة" },
+        { "id": "cairo-zamalek", "name": "الزمالك" },
+        { "id": "cairo-downtown", "name": "وسط البلد" },
+        { "id": "cairo-shubra", "name": "شبرا" },
+        { "id": "cairo-ain-shams", "name": "عين شمس" },
+        { "id": "cairo-mokattam", "name": "المقطم" },
+        { "id": "cairo-badr", "name": "مدينة بدر" }
+      ]
+    },
+    {
+      "id": "giza",
+      "name": "الجيزة",
+      "cities": [
+        { "id": "giza-dokki", "name": "الدقي" },
+        { "id": "giza-mohandessin", "name": "المهندسين" },
+        { "id": "giza-haram", "name": "الهرم" },
+        { "id": "giza-6october", "name": "السادس من أكتوبر" },
+        { "id": "giza-sheikh-zayed", "name": "الشيخ زايد" },
+        { "id": "giza-faisal", "name": "فيصل" },
+        { "id": "giza-badrasheen", "name": "البدرشين" },
+        { "id": "giza-oseem", "name": "أوسيم" }
+      ]
+    },
+    {
+      "id": "alexandria",
+      "name": "الإسكندرية",
+      "cities": [
+        { "id": "alex-montaza", "name": "المنتزه" },
+        { "id": "alex-smouha", "name": "سموحة" },
+        { "id": "alex-sidi-gaber", "name": "سيدي جابر" },
+        { "id": "alex-miami", "name": "ميامي" },
+        { "id": "alex-agami", "name": "العجمي" },
+        { "id": "alex-mansheya", "name": "المنشية" },
+        { "id": "alex-borg-el-arab", "name": "برج العرب" }
+      ]
+    },
+    {
+      "id": "dakahlia",
+      "name": "الدقهلية",
+      "cities": [
+        { "id": "dakahlia-mansoura", "name": "المنصورة" },
+        { "id": "dakahlia-talkha", "name": "طلخا" },
+        { "id": "dakahlia-mit-ghamr", "name": "ميت غمر" },
+        { "id": "dakahlia-belqas", "name": "بلقاس" },
+        { "id": "dakahlia-sherbin", "name": "شربين" },
+        { "id": "dakahlia-aga", "name": "أجا" }
+      ]
+    },
+    {
+      "id": "red-sea",
+      "name": "البحر الأحمر",
+      "cities": [
+        { "id": "redsea-hurghada", "name": "الغردقة" },
+        { "id": "redsea-safaga", "name": "سفاجا" },
+        { "id": "redsea-marsa-alam", "name": "مرسى علم" },
+        { "id": "redsea-ras-ghareb", "name": "رأس غارب" },
+        { "id": "redsea-quseir", "name": "القصير" }
+      ]
+    },
+    {
+      "id": "beheira",
+      "name": "البحيرة",
+      "cities": [
+        { "id": "beheira-damanhour", "name": "دمنهور" },
+        { "id": "beheira-kafr-eldawar", "name": "كفر الدوار" },
+        { "id": "beheira-rashid", "name": "رشيد" },
+        { "id": "beheira-edku", "name": "إدكو" },
+        { "id": "beheira-abu-hummus", "name": "أبو حمص" }
+      ]
+    },
+    {
+      "id": "fayoum",
+      "name": "الفيوم",
+      "cities": [
+        { "id": "fayoum-city", "name": "الفيوم" },
+        { "id": "fayoum-sinnuris", "name": "سنورس" },
+        { "id": "fayoum-tamiya", "name": "طامية" },
+        { "id": "fayoum-itsa", "name": "إطسا" }
+      ]
+    },
+    {
+      "id": "gharbia",
+      "name": "الغربية",
+      "cities": [
+        { "id": "gharbia-tanta", "name": "طنطا" },
+        { "id": "gharbia-mahalla", "name": "المحلة الكبرى" },
+        { "id": "gharbia-kafr-elzayat", "name": "كفر الزيات" },
+        { "id": "gharbia-zefta", "name": "زفتى" },
+        { "id": "gharbia-santa", "name": "السنطة" }
+      ]
+    },
+    {
+      "id": "ismailia",
+      "name": "الإسماعيلية",
+      "cities": [
+        { "id": "ismailia-city", "name": "الإسماعيلية" },
+        { "id": "ismailia-fayed", "name": "فايد" },
+        { "id": "ismailia-qantara", "name": "القنطرة" },
+        { "id": "ismailia-tal-elkebir", "name": "التل الكبير" }
+      ]
+    },
+    {
+      "id": "monufia",
+      "name": "المنوفية",
+      "cities": [
+        { "id": "monufia-shibin-elkom", "name": "شبين الكوم" },
+        { "id": "monufia-menouf", "name": "منوف" },
+        { "id": "monufia-sadat-city", "name": "مدينة السادات" },
+        { "id": "monufia-quesna", "name": "قويسنا" },
+        { "id": "monufia-ashmoun", "name": "أشمون" }
+      ]
+    },
+    {
+      "id": "minya",
+      "name": "المنيا",
+      "cities": [
+        { "id": "minya-city", "name": "المنيا" },
+        { "id": "minya-mallawi", "name": "ملوي" },
+        { "id": "minya-samalut", "name": "سمالوط" },
+        { "id": "minya-bani-mazar", "name": "بني مزار" }
+      ]
+    },
+    {
+      "id": "qalyubia",
+      "name": "القليوبية",
+      "cities": [
+        { "id": "qalyubia-banha", "name": "بنها" },
+        { "id": "qalyubia-shubra-elkheima", "name": "شبرا الخيمة" },
+        { "id": "qalyubia-qaha", "name": "قها" },
+        { "id": "qalyubia-toukh", "name": "طوخ" },
+        { "id": "qalyubia-obour", "name": "مدينة العبور" }
+      ]
+    },
+    {
+      "id": "new-valley",
+      "name": "الوادي الجديد",
+      "cities": [
+        { "id": "newvalley-kharga", "name": "الخارجة" },
+        { "id": "newvalley-dakhla", "name": "الداخلة" },
+        { "id": "newvalley-farafra", "name": "الفرافرة" }
+      ]
+    },
+    {
+      "id": "suez",
+      "name": "السويس",
+      "cities": [
+        { "id": "suez-city", "name": "السويس" },
+        { "id": "suez-arbaeen", "name": "الأربعين" },
+        { "id": "suez-ganayen", "name": "الجناين" }
+      ]
+    },
+    {
+      "id": "aswan",
+      "name": "أسوان",
+      "cities": [
+        { "id": "aswan-city", "name": "أسوان" },
+        { "id": "aswan-kom-ombo", "name": "كوم أمبو" },
+        { "id": "aswan-edfu", "name": "إدفو" },
+        { "id": "aswan-daraw", "name": "دراو" }
+      ]
+    },
+    {
+      "id": "assiut",
+      "name": "أسيوط",
+      "cities": [
+        { "id": "assiut-city", "name": "أسيوط" },
+        { "id": "assiut-dairut", "name": "ديروط" },
+        { "id": "assiut-manfalut", "name": "منفلوط" },
+        { "id": "assiut-abnub", "name": "أبنوب" }
+      ]
+    },
+    {
+      "id": "beni-suef",
+      "name": "بني سويف",
+      "cities": [
+        { "id": "benisuef-city", "name": "بني سويف" },
+        { "id": "benisuef-nasser", "name": "الناصر" },
+        { "id": "benisuef-wasta", "name": "الواسطى" },
+        { "id": "benisuef-ihnasia", "name": "إهناسيا" }
+      ]
+    },
+    {
+      "id": "port-said",
+      "name": "بورسعيد",
+      "cities": [
+        { "id": "portsaid-city", "name": "بورسعيد" },
+        { "id": "portsaid-arab", "name": "حي العرب" },
+        { "id": "portsaid-zohour", "name": "حي الزهور" }
+      ]
+    },
+    {
+      "id": "damietta",
+      "name": "دمياط",
+      "cities": [
+        { "id": "damietta-city", "name": "دمياط" },
+        { "id": "damietta-new", "name": "دمياط الجديدة" },
+        { "id": "damietta-faraskour", "name": "فارسكور" },
+        { "id": "damietta-ras-elbar", "name": "رأس البر" }
+      ]
+    },
+    {
+      "id": "sharqia",
+      "name": "الشرقية",
+      "cities": [
+        { "id": "sharqia-zagazig", "name": "الزقازيق" },
+        { "id": "sharqia-10ramadan", "name": "العاشر من رمضان" },
+        { "id": "sharqia-belbeis", "name": "بلبيس" },
+        { "id": "sharqia-abu-kebir", "name": "أبو كبير" },
+        { "id": "sharqia-minya-elqamh", "name": "منيا القمح" }
+      ]
+    },
+    {
+      "id": "south-sinai",
+      "name": "جنوب سيناء",
+      "cities": [
+        { "id": "southsinai-sharm", "name": "شرم الشيخ" },
+        { "id": "southsinai-dahab", "name": "دهب" },
+        { "id": "southsinai-nuweiba", "name": "نويبع" },
+        { "id": "southsinai-tor", "name": "الطور" }
+      ]
+    },
+    {
+      "id": "kafr-elsheikh",
+      "name": "كفر الشيخ",
+      "cities": [
+        { "id": "kafrelsheikh-city", "name": "كفر الشيخ" },
+        { "id": "kafrelsheikh-desouk", "name": "دسوق" },
+        { "id": "kafrelsheikh-baltim", "name": "بلطيم" },
+        { "id": "kafrelsheikh-metoubes", "name": "مطوبس" }
+      ]
+    },
+    {
+      "id": "matrouh",
+      "name": "مطروح",
+      "cities": [
+        { "id": "matrouh-city", "name": "مرسى مطروح" },
+        { "id": "matrouh-elalamein", "name": "العلمين" },
+        { "id": "matrouh-elhamam", "name": "الحمام" },
+        { "id": "matrouh-siwa", "name": "سيوة" }
+      ]
+    },
+    {
+      "id": "luxor",
+      "name": "الأقصر",
+      "cities": [
+        { "id": "luxor-city", "name": "الأقصر" },
+        { "id": "luxor-esna", "name": "إسنا" },
+        { "id": "luxor-armant", "name": "أرمنت" }
+      ]
+    },
+    {
+      "id": "qena",
+      "name": "قنا",
+      "cities": [
+        { "id": "qena-city", "name": "قنا" },
+        { "id": "qena-naqada", "name": "نقادة" },
+        { "id": "qena-qous", "name": "قوص" },
+        { "id": "qena-farshout", "name": "فرشوط" }
+      ]
+    },
+    {
+      "id": "north-sinai",
+      "name": "شمال سيناء",
+      "cities": [
+        { "id": "northsinai-arish", "name": "العريش" },
+        { "id": "northsinai-sheikh-zuweid", "name": "الشيخ زويد" },
+        { "id": "northsinai-rafah", "name": "رفح" }
+      ]
+    },
+    {
+      "id": "sohag",
+      "name": "سوهاج",
+      "cities": [
+        { "id": "sohag-city", "name": "سوهاج" },
+        { "id": "sohag-akhmim", "name": "أخميم" },
+        { "id": "sohag-girga", "name": "جرجا" },
+        { "id": "sohag-tahta", "name": "طهطا" }
+      ]
+    }
+  ]
+}
