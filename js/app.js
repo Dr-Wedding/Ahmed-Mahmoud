@@ -34,6 +34,7 @@
   // ------------------------------------------------------
   const els = {
     progressSteps: document.querySelectorAll(".progress-step"),
+    installAppBtn: document.getElementById("installAppBtn"),
 
     form: document.getElementById("bookingForm"),
     groomName: document.getElementById("groomName"),
@@ -602,6 +603,43 @@
   }
 
   // ------------------------------------------------------
+  // زر تثبيت التطبيق (PWA Install Prompt)
+  // ------------------------------------------------------
+
+  let deferredInstallPrompt = null;
+
+  function isRunningAsInstalledApp() {
+    return (
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.navigator.standalone === true
+    );
+  }
+
+  function initInstallPrompt() {
+    if (!els.installAppBtn || isRunningAsInstalledApp()) return;
+
+    window.addEventListener("beforeinstallprompt", (event) => {
+      event.preventDefault();
+      deferredInstallPrompt = event;
+      els.installAppBtn.hidden = false;
+    });
+
+    els.installAppBtn.addEventListener("click", async () => {
+      if (!deferredInstallPrompt) return;
+
+      deferredInstallPrompt.prompt();
+      await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      els.installAppBtn.hidden = true;
+    });
+
+    window.addEventListener("appinstalled", () => {
+      deferredInstallPrompt = null;
+      els.installAppBtn.hidden = true;
+    });
+  }
+
+  // ------------------------------------------------------
   // التهيئة الأولية
   // ------------------------------------------------------
 
@@ -610,6 +648,7 @@
     initLocations();
     goToStep(1);
     registerServiceWorker();
+    initInstallPrompt();
   }
 
   init();
