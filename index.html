@@ -5,26 +5,41 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>حجز سيشن زفاف | استوديو التصوير</title>
 <meta name="description" content="احجز سيشن تصوير الفرح خطوة بخطوة، اختر الباكدج المناسبة لك، وأرسل حجزك مباشرة عبر واتساب.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- PWA: يعمل الموقع بالكامل بدون إنترنت بعد أول زيارة -->
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#17151b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AM Photography">
+<link rel="icon" href="./img/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="./img/apple-touch-icon.png">
+
 <link rel="stylesheet" href="./css/style.css">
 </head>
 <body>
 
 <div class="page">
 
+
   <header class="site-header">
-    <div class="brand">
-      <span class="brand-mark" aria-hidden="true">
-        <svg viewBox="0 0 48 48" width="26" height="26" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M24 6c-6 6-12 10-12 18a12 12 0 0 0 24 0c0-8-6-12-12-18Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
-          <path d="M24 16v18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-        </svg>
-      </span>
-      <span class="brand-name">لحظة عمر</span>
-    </div>
+    <img src="./img/logo-gold.png" alt="AHMED MAHMOUD PHOTOGRAPHY" class="brand-logo" width="240" height="178" loading="eager">
     <p class="brand-tagline">حجز سيشن تصوير الأفراح</p>
+
+    <nav class="social-row" aria-label="روابط التواصل الاجتماعي">
+      <a class="social-btn social-btn-whatsapp" href="https://wa.me/201111714320?text=%D9%85%D8%B1%D8%AD%D8%A8%D9%8B%D8%A7%D8%8C%20%D8%A3%D8%B1%D8%B1%D8%AA%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%AC%D9%84%D8%B3%D8%A7%D8%AA%20%D8%A7%D9%84%D8%AA%D8%B5%D9%88%D9%8A%D8%B1" target="_blank" rel="noopener noreferrer" aria-label="تواصل عبر واتساب">
+        <img src="./img/icon-whatsapp.png" alt="" loading="lazy">
+      </a>
+
+      <a class="social-btn social-btn-facebook" href="https://www.facebook.com/ahmd.mhmwd.726577" target="_blank" rel="noopener noreferrer" aria-label="حساب فيسبوك">
+        <img src="./img/icon-facebook.png" alt="" loading="lazy">
+      </a>
+
+      <a class="social-btn social-btn-tiktok" href="https://www.tiktok.com/@ahmed.m.p2" target="_blank" rel="noopener noreferrer" aria-label="حساب تيك توك">
+        <img src="./img/icon-tiktok.png" alt="" loading="lazy">
+      </a>
+    </nav>
   </header>
 
   <nav class="progress-bar" aria-label="مراحل الحجز">
@@ -144,6 +159,10 @@
     </section>
 
   </main>
+
+  <footer class="site-footer">
+    <p>ALL RIGHT RESERVED 2026 - @XERNEL0x58</p>
+  </footer>
 
   <!-- Sticky WhatsApp confirmation bar (visible on step 2 once a package is selected) -->
   <div class="sticky-cta" id="stickyCta" hidden>

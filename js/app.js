@@ -588,6 +588,20 @@
   });
 
   // ------------------------------------------------------
+  // تسجيل Service Worker لتفعيل عمل الموقع بدون إنترنت
+  // ------------------------------------------------------
+
+  function registerServiceWorker() {
+    if (!("serviceWorker" in navigator)) return;
+
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js").catch((err) => {
+        console.error("تعذر تسجيل Service Worker:", err);
+      });
+    });
+  }
+
+  // ------------------------------------------------------
   // التهيئة الأولية
   // ------------------------------------------------------
 
@@ -595,6 +609,7 @@
     initMinDate();
     initLocations();
     goToStep(1);
+    registerServiceWorker();
   }
 
   init();
