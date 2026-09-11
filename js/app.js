@@ -270,6 +270,7 @@
   // ------------------------------------------------------
 
   let packagesLoaded = false;
+  let packagesRawSnapshot = "";
 
   async function ensurePackagesLoaded() {
     if (packagesLoaded) return;
@@ -315,8 +316,95 @@
 
     packagesData = json.packages;
     packagesLoaded = true;
+    packagesRawSnapshot = JSON.stringify(json.packages);
     els.packagesStatus.textContent = "";
     renderPackages();
+    startPackagesAutoRefresh();
+  }
+
+  // ------------------------------------------------------
+  // تحديث تلقائي للباكدجات: لو غيّرت أي باكدج (سعر/اسم/مزايا)
+  // في data/packages.json، الزائر اللي فاتح الصفحة بالفعل يشوف
+  // التحديث تلقائيًا من غير ما يحتاج يعمل Refresh يدوي للصفحة
+  // ------------------------------------------------------
+
+  let packagesAutoRefreshStarted = false;
+
+  function startPackagesAutoRefresh() {
+    if (packagesAutoRefreshStarted) return;
+    packagesAutoRefreshStarted = true;
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "visible") checkForPackagesUpdate();
+    });
+
+    setInterval(checkForPackagesUpdate, 60 * 1000); // كل دقيقة
+  }
+
+  async function checkForPackagesUpdate() {
+    if (!packagesLoaded) return;
+
+    let response;
+    try {
+      // إضافة معامل زمني لتفادي أي كاش وسيط بين المتصفح والسيرفر
+      // (الـService Worker نفسه بيرجع دايمًا للشبكة أولًا لهذا الملف)
+      response = await fetch(`${PACKAGES_JSON_PATH}?t=${Date.now()}`, { cache: "no-store" });
+    } catch (err) {
+      return; // لا يوجد إنترنت الآن — نحاول تاني في المرة الجاية
+    }
+
+    if (!response.ok) return;
+
+    let json;
+    try {
+      json = await response.json();
+    } catch (err) {
+      return;
+    }
+
+    if (!json || !Array.isArray(json.packages)) return;
+
+    const newSnapshot = JSON.stringify(json.packages);
+    if (newSnapshot === packagesRawSnapshot) return; // لا يوجد أي تغيير فعلي
+
+    applyUpdatedPackages(json.packages, newSnapshot);
+  }
+
+  function applyUpdatedPackages(newPackages, newSnapshot) {
+    const previousOpenId = openPackageId;
+    const previousSelectedId = bookingState.selectedPackage ? bookingState.selectedPackage.id : null;
+
+    packagesData = newPackages;
+    packagesRawSnapshot = newSnapshot;
+    renderPackages();
+
+    // استرجاع حالة الأكورديون المفتوح لو الباكدج لسه موجودة
+    const stillHasOpenPkg = newPackages.some((p) => p.id === previousOpenId);
+    openPackageId = stillHasOpenPkg ? previousOpenId : null;
+    if (openPackageId !== null) {
+      const entry = packageCardEls.get(openPackageId);
+      if (entry) {
+        entry.card.classList.add("is-open");
+        entry.header.setAttribute("aria-expanded", "true");
+      }
+    }
+
+    // استرجاع الباكدج المختارة لو لسه موجودة (بقيمها الجديدة لو اتغيّرت)
+    const stillSelectedPkg = newPackages.find((p) => p.id === previousSelectedId) || null;
+    bookingState.selectedPackage = stillSelectedPkg;
+    if (stillSelectedPkg) {
+      const entry = packageCardEls.get(stillSelectedPkg.id);
+      if (entry) entry.card.classList.add("is-selected");
+    }
+    updateStickyCta();
+
+    if (currentStep === 2) {
+      showToast(
+        previousSelectedId && !stillSelectedPkg
+          ? "تم تحديث الباكدجات، وللأسف الباكدج اللي اخترتها لم تعد متاحة"
+          : "تم تحديث الباكدجات"
+      );
+    }
   }
 
   function showPackagesError(message) {
@@ -610,26 +698,26 @@
   function registerServiceWorker() {
     if (!("serviceWorker" in navigator)) return;
 
-    let isReloading = false;
-
-    // بمجرد سيطرة نسخة Service Worker جديدة على الصفحة، تُعاد
-    // تحميلها تلقائيًا مرة واحدة فقط، فيرى الزائر آخر تحديث فورًا
-    navigator.serviceWorker.addEventListener("controllerchange", () => {
-      if (isReloading) return;
-      isReloading = true;
-      window.location.reload();
-    });
-
+    // لا نعمل أي Reload إجباري للصفحة أبدًا — لو الزائر كان في نص ملء
+    // الفورم، تحديث الصفحة فجأة يضيع عليه البيانات. بدل كده، النسخة
+    // الجديدة من الملفات (SW + الكاش) تتحمّل وتتفعّل في الخلفية بهدوء
+    // (self.skipWaiting + self.clients.claim داخل sw.js)، وهتُستخدم
+    // تلقائيًا في أي طلب جديد من غير أي تدخل من الزائر أو أي Refresh مرئي.
     window.addEventListener("load", () => {
       navigator.serviceWorker
         .register("./sw.js")
         .then((registration) => {
-          // التحقق من وجود نسخة أحدث كلما عاد الزائر لتبويب الموقع
+          // التحقق من وجود نسخة أحدث كلما عاد الزائر لتبويب الموقع،
+          // وأيضًا بشكل دوري لو ساب التبويب مفتوح لفترة طويلة
           document.addEventListener("visibilitychange", () => {
             if (document.visibilityState === "visible") {
               registration.update().catch(() => {});
             }
           });
+
+          setInterval(() => {
+            registration.update().catch(() => {});
+          }, 10 * 60 * 1000); // كل 10 دقايق
         })
         .catch((err) => {
           console.error("تعذر تسجيل Service Worker:", err);
