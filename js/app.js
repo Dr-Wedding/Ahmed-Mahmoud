@@ -722,7 +722,7 @@
 
   function initAndroidInstallButton() {
     if (!els.installAppBtn || !els.androidInstallModal) return;
-    if (isRunningAsInstalledApp() || !isAndroidDevice()) return;
+    if (isRunningAsInstalledApp()) return;
 
     els.installAppBtn.hidden = false;
 
@@ -749,7 +749,7 @@
 
   function initIosInstallButton() {
     if (!els.installIosBtn || !els.iosInstallModal) return;
-    if (isRunningAsInstalledApp() || !isIosDevice()) return;
+    if (isRunningAsInstalledApp()) return;
 
     // نعرض الزر لأي متصفح على iOS، لكن لو لم يكن سفاري ننصح المستخدم
     // بفتح الموقع في سفاري تحديدًا داخل نص الإرشادات
