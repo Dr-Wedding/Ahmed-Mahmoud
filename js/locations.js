@@ -46,26 +46,24 @@ async function loadLocations() {
  * @param {Array} locations
  */
 function populateGovernorateSelect(selectEl, locations) {
-  const placeholder = selectEl.querySelector("option[value='']");
-  selectEl.innerHTML = "";
+  const fragment = document.createDocumentFragment();
 
-  if (placeholder) {
-    selectEl.appendChild(placeholder);
-  } else {
-    const opt = document.createElement("option");
-    opt.value = "";
-    opt.disabled = true;
-    opt.selected = true;
-    opt.textContent = "اختر المحافظة";
-    selectEl.appendChild(opt);
-  }
+  const placeholderOpt = document.createElement("option");
+  placeholderOpt.value = "";
+  placeholderOpt.disabled = true;
+  placeholderOpt.selected = true;
+  placeholderOpt.textContent = "اختر المحافظة";
+  fragment.appendChild(placeholderOpt);
 
   locations.forEach((gov) => {
     const option = document.createElement("option");
     option.value = gov.id;
     option.textContent = gov.name;
-    selectEl.appendChild(option);
+    fragment.appendChild(option);
   });
+
+  // استبدال محتوى القائمة بعملية DOM واحدة فقط بدل إضافة كل عنصر على حدة
+  selectEl.replaceChildren(fragment);
 }
 
 /**
@@ -75,18 +73,19 @@ function populateGovernorateSelect(selectEl, locations) {
  * @param {string} governorateId
  */
 function populateCitySelect(selectEl, locations, governorateId) {
-  selectEl.innerHTML = "";
+  const fragment = document.createDocumentFragment();
 
   const placeholderOpt = document.createElement("option");
   placeholderOpt.value = "";
   placeholderOpt.disabled = true;
   placeholderOpt.selected = true;
   placeholderOpt.textContent = "اختر المدينة";
-  selectEl.appendChild(placeholderOpt);
+  fragment.appendChild(placeholderOpt);
 
   const governorate = locations.find((gov) => gov.id === governorateId);
 
   if (!governorate) {
+    selectEl.replaceChildren(fragment);
     selectEl.disabled = true;
     return;
   }
@@ -95,8 +94,11 @@ function populateCitySelect(selectEl, locations, governorateId) {
     const option = document.createElement("option");
     option.value = city.id;
     option.textContent = city.name;
-    selectEl.appendChild(option);
+    fragment.appendChild(option);
   });
+
+  // عملية DOM واحدة فقط بدل استدعاء innerHTML + appendChild لكل مدينة
+  selectEl.replaceChildren(fragment);
 
   selectEl.disabled = false;
 }

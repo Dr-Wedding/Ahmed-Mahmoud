@@ -24,24 +24,28 @@
 
 
   <header class="site-header">
-    <img src="./img/logo-gold.png" alt="AHMED MAHMOUD PHOTOGRAPHY" class="brand-logo" width="240" height="178" loading="eager">
+    <img src="./img/logo-gold.png" alt="AHMED MAHMOUD PHOTOGRAPHY" class="brand-logo" width="240" height="178" decoding="async" fetchpriority="high">
     <p class="brand-tagline">حجز سيشن تصوير الأفراح</p>
 
     <nav class="social-row" aria-label="روابط التواصل الاجتماعي">
       <a class="social-btn social-btn-whatsapp" href="https://wa.me/201111714320?text=%D9%85%D8%B1%D8%AD%D8%A8%D9%8B%D8%A7%D8%8C%20%D8%A3%D8%B1%D8%B1%D8%AA%20%D8%A7%D9%84%D8%A7%D8%B3%D8%AA%D9%81%D8%B3%D8%A7%D8%B1%20%D8%B9%D9%86%20%D8%AC%D9%84%D8%B3%D8%A7%D8%AA%20%D8%A7%D9%84%D8%AA%D8%B5%D9%88%D9%8A%D8%B1" target="_blank" rel="noopener noreferrer" aria-label="تواصل عبر واتساب">
-        <img src="./img/icon-whatsapp.png" alt="" loading="lazy">
+        <img src="./img/icon-whatsapp.png" alt="" width="21" height="21" decoding="async" fetchpriority="high">
       </a>
 
       <a class="social-btn social-btn-facebook" href="https://www.facebook.com/ahmd.mhmwd.726577" target="_blank" rel="noopener noreferrer" aria-label="حساب فيسبوك">
-        <img src="./img/icon-facebook.png" alt="" loading="lazy">
+        <img src="./img/icon-facebook.png" alt="" width="21" height="21" decoding="async" fetchpriority="high">
       </a>
 
       <a class="social-btn social-btn-tiktok" href="https://www.tiktok.com/@ahmed.m.p2" target="_blank" rel="noopener noreferrer" aria-label="حساب تيك توك">
-        <img src="./img/icon-tiktok.png" alt="" loading="lazy">
+        <img src="./img/icon-tiktok.png" alt="" width="21" height="21" decoding="async" fetchpriority="high">
       </a>
 
       <button type="button" class="social-btn social-btn-install" id="installAppBtn" aria-label="تثبيت التطبيق على أندرويد" title="تثبيت التطبيق" hidden>
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85-.29-.15-.65-.06-.83.22l-1.88 3.24a11.463 11.463 0 0 0-8.94 0L5.65 5.67a.637.637 0 0 0-.87-.2c-.28.18-.37.54-.22.85L6.4 9.48A10.78 10.78 0 0 0 1 18h22a10.785 10.785 0 0 0-5.4-8.52zM7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/></svg>
+        <img src="./img/icon-android-gold.png" alt="" width="21" height="12" decoding="async">
+      </button>
+
+      <button type="button" class="social-btn social-btn-install" id="installIosBtn" aria-label="تثبيت التطبيق على آيفون" title="تثبيت التطبيق" hidden>
+        <img src="./img/icon-apple-gold.png" alt="" width="17" height="21" decoding="async">
       </button>
     </nav>
   </header>
@@ -185,6 +189,65 @@
   </div>
 
   <div class="toast" id="toast" role="alert" aria-live="assertive" hidden></div>
+
+  <!-- شاشة إرشادات التثبيت اليدوي على آيفون (سفاري لا يسمح بالتثبيت التلقائي) -->
+  <div class="install-modal-backdrop" id="iosInstallModal" hidden>
+    <div class="install-modal" role="dialog" aria-modal="true" aria-labelledby="iosModalTitle">
+      <button type="button" class="install-modal-close" id="iosModalClose" aria-label="إغلاق">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+
+      <h2 id="iosModalTitle" class="install-modal-title">تثبيت التطبيق على آيفون</h2>
+      <p class="install-modal-hint" id="iosModalHint">سفاري لا يسمح بالتثبيت بضغطة واحدة، لكن الأمر يستغرق خطوتين فقط:</p>
+
+      <ol class="install-modal-steps">
+        <li>
+          <span class="install-step-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0-4-4m4 4 4-4M5 15v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </span>
+          <span>افتح الموقع في متصفح <strong>Safari</strong> ثم اضغط على زر <strong>المشاركة (Share)</strong> في شريط الأدوات</span>
+        </li>
+        <li>
+          <span class="install-step-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          </span>
+          <span>مرّر لأسفل واختر <strong>"إضافة إلى الشاشة الرئيسية"</strong> (Add to Home Screen)</span>
+        </li>
+      </ol>
+
+      <button type="button" class="btn btn-primary btn-block" id="iosModalGotIt">تمام، فهمت</button>
+    </div>
+  </div>
+
+  <!-- شاشة إرشادات التثبيت اليدوي على أندرويد (تظهر فقط لو المتصفح
+       لا يدعم التثبيت التلقائي بضغطة واحدة، مثل Samsung Internet وFirefox) -->
+  <div class="install-modal-backdrop" id="androidInstallModal" hidden>
+    <div class="install-modal" role="dialog" aria-modal="true" aria-labelledby="androidModalTitle">
+      <button type="button" class="install-modal-close" id="androidModalClose" aria-label="إغلاق">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+
+      <h2 id="androidModalTitle" class="install-modal-title">تثبيت التطبيق على أندرويد</h2>
+      <p class="install-modal-hint">متصفحك الحالي لا يدعم التثبيت بضغطة واحدة، لكن الأمر يستغرق خطوتين فقط:</p>
+
+      <ol class="install-modal-steps">
+        <li>
+          <span class="install-step-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="6" r="1.4" fill="currentColor"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/><circle cx="12" cy="18" r="1.4" fill="currentColor"/></svg>
+          </span>
+          <span>اضغط على <strong>قائمة المتصفح (⋮)</strong> الموجودة أعلى أو أسفل الشاشة</span>
+        </li>
+        <li>
+          <span class="install-step-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.7"/><path d="M12 8v8M8 12h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>
+          </span>
+          <span>اختر <strong>"تثبيت التطبيق"</strong> أو <strong>"إضافة إلى الشاشة الرئيسية"</strong></span>
+        </li>
+      </ol>
+
+      <button type="button" class="btn btn-primary btn-block" id="androidModalGotIt">تمام، فهمت</button>
+    </div>
+  </div>
 
 </div>
 

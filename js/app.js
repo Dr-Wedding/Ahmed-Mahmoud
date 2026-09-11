@@ -28,6 +28,7 @@
   let packagesData = [];
   let currentStep = 1;
   let openPackageId = null;
+  const packageCardEls = new Map(); // packageId -> { card, header }
 
   // ------------------------------------------------------
   // مراجع DOM
@@ -35,6 +36,13 @@
   const els = {
     progressSteps: document.querySelectorAll(".progress-step"),
     installAppBtn: document.getElementById("installAppBtn"),
+    installIosBtn: document.getElementById("installIosBtn"),
+    iosInstallModal: document.getElementById("iosInstallModal"),
+    iosModalClose: document.getElementById("iosModalClose"),
+    iosModalGotIt: document.getElementById("iosModalGotIt"),
+    androidInstallModal: document.getElementById("androidInstallModal"),
+    androidModalClose: document.getElementById("androidModalClose"),
+    androidModalGotIt: document.getElementById("androidModalGotIt"),
 
     form: document.getElementById("bookingForm"),
     groomName: document.getElementById("groomName"),
@@ -318,6 +326,8 @@
 
   function renderPackages() {
     els.packagesAccordion.innerHTML = "";
+    packageCardEls.clear();
+    const fragment = document.createDocumentFragment();
 
     packagesData.forEach((pkg) => {
       const card = document.createElement("div");
@@ -401,7 +411,8 @@
 
       card.appendChild(header);
       card.appendChild(panel);
-      els.packagesAccordion.appendChild(card);
+      fragment.appendChild(card);
+      packageCardEls.set(pkg.id, { card, header });
 
       header.addEventListener("click", () => toggleAccordion(pkg.id));
       selectBtn.addEventListener("click", (event) => {
@@ -409,18 +420,19 @@
         selectPackage(pkg.id);
       });
     });
+
+    // إضافة كل الباكدجات دفعة واحدة بدل عملية DOM منفصلة لكل باكدج
+    els.packagesAccordion.appendChild(fragment);
   }
 
   function toggleAccordion(packageId) {
     const willOpen = openPackageId !== packageId;
     openPackageId = willOpen ? packageId : null;
 
-    document.querySelectorAll(".package-card").forEach((card) => {
-      const id = Number(card.dataset.packageId);
+    packageCardEls.forEach(({ card, header }, id) => {
       const isOpen = id === openPackageId;
       card.classList.toggle("is-open", isOpen);
-      const headerBtn = card.querySelector(".package-header");
-      headerBtn.setAttribute("aria-expanded", String(isOpen));
+      header.setAttribute("aria-expanded", String(isOpen));
     });
   }
 
@@ -430,8 +442,7 @@
 
     bookingState.selectedPackage = pkg;
 
-    document.querySelectorAll(".package-card").forEach((card) => {
-      const id = Number(card.dataset.packageId);
+    packageCardEls.forEach(({ card }, id) => {
       card.classList.toggle("is-selected", id === packageId);
     });
 
@@ -518,9 +529,11 @@
     totalRow.appendChild(totalPrice);
     packageBlock.appendChild(totalRow);
 
-    els.summaryCard.appendChild(groomBlock);
-    els.summaryCard.appendChild(detailsBlock);
-    els.summaryCard.appendChild(packageBlock);
+    const summaryFragment = document.createDocumentFragment();
+    summaryFragment.appendChild(groomBlock);
+    summaryFragment.appendChild(detailsBlock);
+    summaryFragment.appendChild(packageBlock);
+    els.summaryCard.appendChild(summaryFragment);
   }
 
   function summaryRow(label, value) {
@@ -590,20 +603,42 @@
 
   // ------------------------------------------------------
   // تسجيل Service Worker لتفعيل عمل الموقع بدون إنترنت
+  // + تحديث الموقع تلقائيًا عند نشر نسخة جديدة، بدون أن
+  // يحتاج الزائر لعمل تحديث يدوي للصفحة
   // ------------------------------------------------------
 
   function registerServiceWorker() {
     if (!("serviceWorker" in navigator)) return;
 
+    let isReloading = false;
+
+    // بمجرد سيطرة نسخة Service Worker جديدة على الصفحة، تُعاد
+    // تحميلها تلقائيًا مرة واحدة فقط، فيرى الزائر آخر تحديث فورًا
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (isReloading) return;
+      isReloading = true;
+      window.location.reload();
+    });
+
     window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./sw.js").catch((err) => {
-        console.error("تعذر تسجيل Service Worker:", err);
-      });
+      navigator.serviceWorker
+        .register("./sw.js")
+        .then((registration) => {
+          // التحقق من وجود نسخة أحدث كلما عاد الزائر لتبويب الموقع
+          document.addEventListener("visibilitychange", () => {
+            if (document.visibilityState === "visible") {
+              registration.update().catch(() => {});
+            }
+          });
+        })
+        .catch((err) => {
+          console.error("تعذر تسجيل Service Worker:", err);
+        });
     });
   }
 
   // ------------------------------------------------------
-  // زر تثبيت التطبيق (PWA Install Prompt)
+  // أزرار تثبيت التطبيق (أندرويد + آيفون)
   // ------------------------------------------------------
 
   let deferredInstallPrompt = null;
@@ -615,28 +650,120 @@
     );
   }
 
-  function initInstallPrompt() {
-    if (!els.installAppBtn || isRunningAsInstalledApp()) return;
+  function isIosDevice() {
+    const ua = window.navigator.userAgent;
+    const isClassicIos = /iPhone|iPod/.test(ua);
+    // ابتداءً من iPadOS 13 يظهر متصفح آيباد بنفس هوية سفاري على ماك،
+    // لذلك نميّزه عبر توفر شاشة لمس بدل الاعتماد على User Agent فقط
+    const isModernIpad = window.navigator.platform === "MacIntel" && window.navigator.maxTouchPoints > 1;
+    return isClassicIos || isModernIpad || /iPad/.test(ua);
+  }
 
+  function isAndroidDevice() {
+    return /Android/i.test(window.navigator.userAgent);
+  }
+
+  function isSafariBrowser() {
+    const ua = window.navigator.userAgent;
+    // كروم وفايرفوكس على iOS يضيفان CriOS / FxiOS في الـ User Agent
+    return /^((?!chrome|android|crios|fxios).)*safari/i.test(ua);
+  }
+
+  function openModal(modalEl) {
+    modalEl.hidden = false;
+    document.body.style.overflow = "hidden";
+  }
+
+  function closeModal(modalEl) {
+    modalEl.hidden = true;
+    document.body.style.overflow = "";
+  }
+
+  // يربط أزرار الإغلاق (X / زر "تمام فهمت" / الضغط خارج الصندوق / Escape)
+  // بأي نافذة إرشادات تثبيت — نفس المنطق يُستخدم لكل من نافذتي أندرويد وآيفون
+  function wireModalDismissal(modalEl, closeBtn, gotItBtn) {
+    closeBtn.addEventListener("click", () => closeModal(modalEl));
+    gotItBtn.addEventListener("click", () => closeModal(modalEl));
+
+    modalEl.addEventListener("click", (event) => {
+      if (event.target === modalEl) closeModal(modalEl);
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && !modalEl.hidden) closeModal(modalEl);
+    });
+  }
+
+  function initInstallPrompt() {
+    // نلتقط حدث beforeinstallprompt بغض النظر عن المنصة، فلو توفر
+    // (متصفحات كروميوم على أندرويد أو ديسكتوب) نستخدمه للتثبيت
+    // المباشر بضغطة واحدة، ولو لم يتوفر نعرض إرشادات يدوية بديلة
     window.addEventListener("beforeinstallprompt", (event) => {
       event.preventDefault();
       deferredInstallPrompt = event;
-      els.installAppBtn.hidden = false;
-    });
-
-    els.installAppBtn.addEventListener("click", async () => {
-      if (!deferredInstallPrompt) return;
-
-      deferredInstallPrompt.prompt();
-      await deferredInstallPrompt.userChoice;
-      deferredInstallPrompt = null;
-      els.installAppBtn.hidden = true;
     });
 
     window.addEventListener("appinstalled", () => {
       deferredInstallPrompt = null;
-      els.installAppBtn.hidden = true;
+      if (els.installAppBtn) els.installAppBtn.hidden = true;
     });
+
+    initAndroidInstallButton();
+    initIosInstallButton();
+  }
+
+  // ------------------------------------------------------
+  // زر تثبيت التطبيق على أندرويد — يظهر لأي متصفح على أندرويد
+  // (وليس فقط كروم)، لأن بعض المتصفحات مثل Samsung Internet
+  // وFirefox لا تطلق حدث beforeinstallprompt أبدًا. لو الحدث
+  // متوفر نستخدم نافذة التثبيت الرسمية بضغطة واحدة، ولو لم يكن
+  // متوفرًا نعرض إرشادات يدوية بديلة بنفس فلسفة زر آيفون
+  // ------------------------------------------------------
+
+  function initAndroidInstallButton() {
+    if (!els.installAppBtn || !els.androidInstallModal) return;
+    if (isRunningAsInstalledApp() || !isAndroidDevice()) return;
+
+    els.installAppBtn.hidden = false;
+
+    els.installAppBtn.addEventListener("click", async () => {
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        await deferredInstallPrompt.userChoice;
+        deferredInstallPrompt = null;
+        els.installAppBtn.hidden = true;
+        return;
+      }
+
+      // المتصفح لا يدعم التثبيت التلقائي بضغطة واحدة
+      openModal(els.androidInstallModal);
+    });
+
+    wireModalDismissal(els.androidInstallModal, els.androidModalClose, els.androidModalGotIt);
+  }
+
+  // ------------------------------------------------------
+  // زر تثبيت التطبيق على آيفون (سفاري لا يوفّر أي API لبدء
+  // التثبيت تلقائيًا، فنعرض إرشادات التثبيت اليدوي بخطوتين)
+  // ------------------------------------------------------
+
+  function initIosInstallButton() {
+    if (!els.installIosBtn || !els.iosInstallModal) return;
+    if (isRunningAsInstalledApp() || !isIosDevice()) return;
+
+    // نعرض الزر لأي متصفح على iOS، لكن لو لم يكن سفاري ننصح المستخدم
+    // بفتح الموقع في سفاري تحديدًا داخل نص الإرشادات
+    els.installIosBtn.hidden = false;
+
+    if (!isSafariBrowser()) {
+      const hint = document.getElementById("iosModalHint");
+      if (hint) {
+        hint.textContent = "متصفحك الحالي لا يدعم التثبيت على الشاشة الرئيسية — افتح هذا الموقع في متصفح Safari أولًا، ثم اتبع الخطوتين التاليتين:";
+      }
+    }
+
+    els.installIosBtn.addEventListener("click", () => openModal(els.iosInstallModal));
+    wireModalDismissal(els.iosInstallModal, els.iosModalClose, els.iosModalGotIt);
   }
 
   // ------------------------------------------------------

@@ -95,7 +95,7 @@ body {
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: 9px;
   margin-top: 18px;
 }
 
@@ -103,8 +103,8 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 54px;
-  height: 54px;
+  width: 46px;
+  height: 46px;
   border-radius: 50%;
   border: 1px solid var(--line-strong);
   color: var(--ivory-dim);
@@ -115,17 +115,24 @@ body {
   transition: color 0.2s ease, border-color 0.2s ease, transform 0.15s ease;
 }
 
+/* ضروري: بدون هذا، خاصية hidden لا تعمل على أزرار install
+   (Android/iOS) لأن display:inline-flex أعلاه يتغلّب على
+   قاعدة [hidden]{display:none} الافتراضية من المتصفح */
+.social-btn[hidden] {
+  display: none;
+}
+
 .social-btn img {
-  width: 25px;
-  height: 25px;
+  width: 21px;
+  height: 21px;
   flex-shrink: 0;
   display: block;
   object-fit: contain;
 }
 
 .social-btn svg {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   flex-shrink: 0;
 }
 
@@ -506,6 +513,7 @@ body {
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   overflow: hidden;
+  contain: layout;
   transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
@@ -593,7 +601,7 @@ body {
 .package-chevron {
   flex-shrink: 0;
   color: var(--ivory-dim);
-  transition: transform 0.3s ease;
+  transition: transform 0.24s ease;
 }
 
 .package-card.is-open .package-chevron {
@@ -604,7 +612,7 @@ body {
 .package-panel {
   display: grid;
   grid-template-rows: 0fr;
-  transition: grid-template-rows 0.32s ease;
+  transition: grid-template-rows 0.24s ease;
 }
 
 .package-card.is-open .package-panel {
@@ -822,6 +830,134 @@ body {
 @keyframes toast-in {
   from { opacity: 0; transform: translate(-50%, 8px); }
   to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* =========================================================
+   iOS Install Instructions Modal
+   ========================================================= */
+.install-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 100;
+  animation: install-backdrop-in 0.2s ease both;
+}
+
+/* ضروري: بدون هذا التصريح الصريح، يتجاهل المتصفح خاصية hidden
+   لأن display:flex أعلاه (قاعدة من المطوّر) تتغلّب على قاعدة
+   [hidden]{display:none} الافتراضية من المتصفح نفسه */
+.install-modal-backdrop[hidden] {
+  display: none;
+}
+
+@keyframes install-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.install-modal {
+  position: relative;
+  width: 100%;
+  max-width: 480px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--line);
+  border-bottom: none;
+  border-radius: 24px 24px 0 0;
+  padding: 28px 22px calc(24px + env(safe-area-inset-bottom));
+  box-shadow: var(--shadow-soft);
+  animation: install-modal-in 0.25s ease both;
+}
+
+@keyframes install-modal-in {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.install-modal-close {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  color: var(--ivory-dim);
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.install-modal-close svg {
+  width: 16px;
+  height: 16px;
+}
+
+.install-modal-close:hover {
+  color: var(--ivory);
+  border-color: var(--gold);
+}
+
+.install-modal-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--ivory);
+  margin: 0 0 8px;
+  padding-inline-end: 30px;
+}
+
+.install-modal-hint {
+  color: var(--ivory-dim);
+  font-size: 0.88rem;
+  margin: 0 0 22px;
+  line-height: 1.6;
+}
+
+.install-modal-steps {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.install-modal-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.92rem;
+  color: var(--ivory);
+  line-height: 1.65;
+}
+
+.install-modal-steps strong {
+  color: var(--gold-light);
+  font-weight: 700;
+}
+
+.install-step-icon {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--bg-elevated-2);
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+}
+
+.install-step-icon svg {
+  width: 19px;
+  height: 19px;
 }
 
 /* =========================================================
