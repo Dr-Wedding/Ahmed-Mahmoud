@@ -698,11 +698,22 @@
   function registerServiceWorker() {
     if (!("serviceWorker" in navigator)) return;
 
-    // لا نعمل أي Reload إجباري للصفحة أبدًا — لو الزائر كان في نص ملء
-    // الفورم، تحديث الصفحة فجأة يضيع عليه البيانات. بدل كده، النسخة
-    // الجديدة من الملفات (SW + الكاش) تتحمّل وتتفعّل في الخلفية بهدوء
-    // (self.skipWaiting + self.clients.claim داخل sw.js)، وهتُستخدم
-    // تلقائيًا في أي طلب جديد من غير أي تدخل من الزائر أو أي Refresh مرئي.
+    // بمجرد ما نسخة Service Worker جديدة (بعد تحديث أي ملف على الموقع)
+    // تخلص تحميل وتاخد السيطرة على الصفحة المفتوحة بالفعل (self.skipWaiting
+    // + self.clients.claim داخل sw.js)، حدث "controllerchange" ده بيطلق.
+    // هنا، وبدل ما نسيب الزائر يحتاج يعمل تحديث يدوي (وأحيانًا أكتر من
+    // مرة) عشان يشوف آخر نسخة، بنحفظ أي بيانات كان بيكتبها في الفورم،
+    // ثم نعمل Reload صامت وتلقائي مرة واحدة بس للصفحة، فيشوف آخر تحديث
+    // فورًا من غير أي فعل منه وبدون ما يضيع أي حاجة كان بيكتبها.
+    let hasReloadedForUpdate = false;
+
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (hasReloadedForUpdate) return;
+      hasReloadedForUpdate = true;
+      captureDraftForAutoUpdate();
+      window.location.reload();
+    });
+
     window.addEventListener("load", () => {
       navigator.serviceWorker
         .register("./sw.js")
@@ -723,6 +734,116 @@
           console.error("تعذر تسجيل Service Worker:", err);
         });
     });
+  }
+
+  // ------------------------------------------------------
+  // حفظ واسترجاع بيانات الفورم عبر الـReload التلقائي: عشان
+  // الزائر متأثرش لو التحديث التلقائي حصل وهو لسه بيكتب بياناته
+  // ------------------------------------------------------
+
+  const AUTO_UPDATE_DRAFT_KEY = "amPhotographyAutoUpdateDraft";
+  let pendingDraft = null;
+
+  function captureDraftForAutoUpdate() {
+    try {
+      const draft = {
+        currentStep,
+        groomName: els.groomName.value,
+        phone: els.phone.value,
+        sameWhatsapp: els.sameWhatsapp.checked,
+        whatsapp: els.whatsapp.value,
+        bookingDate: els.bookingDate.value,
+        governorate: els.governorate.value,
+        city: els.city.value,
+        selectedPackageId: bookingState.selectedPackage ? bookingState.selectedPackage.id : null
+      };
+      sessionStorage.setItem(AUTO_UPDATE_DRAFT_KEY, JSON.stringify(draft));
+    } catch (err) {
+      // sessionStorage مش متاح (وضع تصفح خاص مثلاً) — نادر جدًا،
+      // وأقصى أثر إنه هيضيع استكمال الفورم فقط، مش أي حاجة تانية
+    }
+  }
+
+  function restoreDraftIfAny() {
+    let raw = null;
+    try {
+      raw = sessionStorage.getItem(AUTO_UPDATE_DRAFT_KEY);
+      if (raw) sessionStorage.removeItem(AUTO_UPDATE_DRAFT_KEY);
+    } catch (err) {
+      return;
+    }
+
+    if (!raw) return;
+
+    try {
+      pendingDraft = JSON.parse(raw);
+    } catch (err) {
+      pendingDraft = null;
+      return;
+    }
+
+    if (!pendingDraft) return;
+
+    els.groomName.value = pendingDraft.groomName || "";
+    els.phone.value = pendingDraft.phone || "";
+    els.sameWhatsapp.checked = pendingDraft.sameWhatsapp !== false;
+    syncWhatsappField();
+    if (!els.sameWhatsapp.checked) {
+      els.whatsapp.value = pendingDraft.whatsapp || "";
+    }
+    els.bookingDate.value = pendingDraft.bookingDate || "";
+
+    Object.assign(bookingState, {
+      groomName: pendingDraft.groomName || "",
+      phone: pendingDraft.phone || "",
+      whatsapp: els.whatsapp.value,
+      sameWhatsapp: els.sameWhatsapp.checked,
+      bookingDate: pendingDraft.bookingDate || ""
+    });
+  }
+
+  // يُستدعى بعد ما بيانات المحافظات والمدن تخلص تحميل، عشان يرجّع
+  // اختيار المحافظة والمدينة المحفوظين (لو موجودين) قبل الـReload
+  function applyPendingLocationDraft() {
+    if (!pendingDraft || !pendingDraft.governorate) return;
+
+    els.governorate.value = pendingDraft.governorate;
+    populateCitySelect(els.city, locationsData, pendingDraft.governorate);
+    if (pendingDraft.city) els.city.value = pendingDraft.city;
+
+    bookingState.governorate = pendingDraft.governorate;
+    bookingState.city = pendingDraft.city || "";
+  }
+
+  // يُستدعى بعد انتهاء تحميل المحافظات، عشان يكمّل الزائر من نفس
+  // الخطوة والباكدج اللي كان واقف عليها قبل الـReload التلقائي
+  async function resumeFromPendingDraft() {
+    if (!pendingDraft) {
+      goToStep(1);
+      return;
+    }
+
+    applyPendingLocationDraft();
+
+    const targetStep = pendingDraft.currentStep || 1;
+
+    if (targetStep >= 2) {
+      await ensurePackagesLoaded();
+      if (pendingDraft.selectedPackageId) {
+        selectPackage(pendingDraft.selectedPackageId);
+      }
+    }
+
+    if (targetStep >= 3 && bookingState.selectedPackage) {
+      renderSummary();
+      goToStep(3);
+    } else if (targetStep >= 2) {
+      goToStep(2);
+    } else {
+      goToStep(1);
+    }
+
+    pendingDraft = null;
   }
 
   // ------------------------------------------------------
@@ -860,8 +981,9 @@
 
   function init() {
     initMinDate();
-    initLocations();
+    restoreDraftIfAny();
     goToStep(1);
+    initLocations().then(resumeFromPendingDraft);
     registerServiceWorker();
     initInstallPrompt();
   }
