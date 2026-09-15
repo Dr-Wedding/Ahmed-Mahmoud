@@ -12,7 +12,7 @@
 // الشبكة في الخلفية، وبعدها js/app.js بيعمل Reload تلقائي وصامت
 // لأي تبويب مفتوح بالفعل — الزائر يشوف آخر نسخة من غير أي تدخل
 // يدوي منه، وبدون ما يضيع أي بيانات كان بيكتبها في الفورم.
-const CACHE_VERSION = "v10";
+const CACHE_VERSION = "v12";
 const CACHE_NAME = `am-photography-${CACHE_VERSION}`;
 
 // ملفات الهيكل الأساسي للموقع (نادرًا ما تتغيّر) — كاش أولًا لسرعة فورية،
@@ -26,6 +26,7 @@ const APP_SHELL = [
   "./js/validation.js",
   "./js/locations.js",
   "./img/logo-gold.png",
+  "./img/logo-gold.webp",
   "./img/icon-whatsapp.png",
   "./img/icon-android-gold.png",
   "./img/icon-apple-gold.png",
@@ -40,7 +41,7 @@ const APP_SHELL = [
 // ملفات البيانات (الباكدجات والمحافظات) — تتغيّر بشكل متكرر مع تعديلات
 // صاحب الموقع، لذلك نطلبها من الشبكة أولًا كي يظهر أي تعديل فورًا،
 // وتُستخدم النسخة المخزنة فقط عند انعدام الإنترنت
-const NETWORK_FIRST_URLS = ["./data/packages.json", "./data/egypt-locations.json"];
+const NETWORK_FIRST_URLS = ["./data/packages.json", "./data/egypt-locations.json", "./data/booked-dates.json"];
 
 const ALL_PRECACHE_URLS = [...APP_SHELL, ...NETWORK_FIRST_URLS];
 
@@ -86,23 +87,37 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  const isNetworkFirst = NETWORK_FIRST_URLS.some((url) => request.url.endsWith(url.replace("./", "/")));
+  // نقارن بالمسار فقط (بدون أي Query String) عشان نتعرّف صح على طلبات
+  // تحديث الباكدجات التلقائي حتى لو معاها ?t=... لمنع أي كاش وسيط
+  const requestPath = new URL(request.url).pathname;
+  const isNetworkFirst = NETWORK_FIRST_URLS.some((url) => requestPath.endsWith(url.replace("./", "/")));
 
   event.respondWith(isNetworkFirst ? networkFirst(request) : cacheFirst(request));
 });
 
+// مفتاح كاش موحّد بدون أي Query String، عشان طلبات نفس الملف اللي
+// بيتغيّر معاها ?t=timestamp (تحديث الباكدجات كل دقيقة) تتخزن كلها
+// تحت نفس المفتاح بدل ما تتراكم كإدخالات كاش منفصلة بلا نهاية
+function normalizedCacheKey(request) {
+  const url = new URL(request.url);
+  url.search = "";
+  return new Request(url.toString(), { method: "GET" });
+}
+
 // الشبكة أولًا: لبيانات الباكدجات والمحافظات، حتى تظهر أي تعديلات
 // فورًا لأي زائر متصل بالإنترنت، مع البقاء على الكاش كخطة بديلة بدون نت
 async function networkFirst(request) {
+  const cacheKey = normalizedCacheKey(request);
   try {
     const networkResponse = await fetch(request);
     if (networkResponse && networkResponse.status === 200) {
       const cache = await caches.open(CACHE_NAME);
-      cache.put(request, networkResponse.clone());
+      cache.put(cacheKey, networkResponse.clone());
     }
     return networkResponse;
   } catch (err) {
-    const cachedResponse = await caches.match(request);
+    const cache = await caches.open(CACHE_NAME);
+    const cachedResponse = await cache.match(cacheKey);
     if (cachedResponse) return cachedResponse;
     throw err;
   }

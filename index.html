@@ -6,6 +6,17 @@
 <title>حجز سيشن زفاف | استوديو التصوير</title>
 <meta name="description" content="احجز سيشن تصوير الفرح خطوة بخطوة، اختر الباكدج المناسبة لك، وأرسل حجزك مباشرة عبر واتساب.">
 
+<!-- Open Graph / روابط المشاركة على واتساب وفيسبوك -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Ahmed Mahmoud Photography | حجز سيشن تصوير الفرح">
+<meta property="og:description" content="احجز سيشن تصوير الفرح خطوة بخطوة، اختر الباكدج المناسبة لك، وأرسل حجزك مباشرة عبر واتساب.">
+<meta property="og:image" content="./img/logo-gold.png">
+<meta property="og:locale" content="ar_EG">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Ahmed Mahmoud Photography | حجز سيشن تصوير الفرح">
+<meta name="twitter:description" content="احجز سيشن تصوير الفرح خطوة بخطوة، اختر الباكدج المناسبة لك، وأرسل حجزك مباشرة عبر واتساب.">
+<meta name="twitter:image" content="./img/logo-gold.png">
+
 <!-- PWA: يعمل الموقع بالكامل بدون إنترنت بعد أول زيارة -->
 <link rel="manifest" href="./manifest.json">
 <meta name="theme-color" content="#17151b">
@@ -17,6 +28,22 @@
 <link rel="apple-touch-icon" href="./img/apple-touch-icon.png">
 
 <link rel="stylesheet" href="./css/style.css">
+
+<!-- Schema.org: يساعد جوجل يفهم إن الموقع لاستوديو تصوير -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Photographer",
+  "name": "Ahmed Mahmoud Photography",
+  "image": "./img/logo-gold.png",
+  "priceRange": "$$",
+  "areaServed": "EG",
+  "sameAs": [
+    "https://www.facebook.com/ahmd.mhmwd.726577",
+    "https://www.tiktok.com/@ahmed.m.p2"
+  ]
+}
+</script>
 </head>
 <body>
 
@@ -24,7 +51,10 @@
 
 
   <header class="site-header">
-    <img src="./img/logo-gold.png" alt="AHMED MAHMOUD PHOTOGRAPHY" class="brand-logo" width="240" height="178" decoding="async" fetchpriority="high">
+    <picture>
+      <source srcset="./img/logo-gold.webp" type="image/webp">
+      <img src="./img/logo-gold.png" alt="AHMED MAHMOUD PHOTOGRAPHY" class="brand-logo" width="240" height="178" decoding="async" fetchpriority="high">
+    </picture>
     <p class="brand-tagline">احجز سيشن فرحك دلوقتي</p>
 
     <nav class="social-row" aria-label="روابط التواصل الاجتماعي">
@@ -40,11 +70,11 @@
         <img src="./img/icon-tiktok.png" alt="" width="21" height="21" decoding="async" fetchpriority="high">
       </a>
 
-      <button type="button" class="social-btn social-btn-install" id="installAppBtn" aria-label="تثبيت التطبيق على أندرويد" title="تثبيت التطبيق" hidden>
+      <button type="button" class="social-btn social-btn-install" id="installAppBtn" aria-label="تثبيت التطبيق على أندرويد" title="تثبيت التطبيق">
         <img src="./img/icon-android-gold.png" alt="" width="21" height="12" decoding="async">
       </button>
 
-      <button type="button" class="social-btn social-btn-install" id="installIosBtn" aria-label="تثبيت التطبيق على آيفون" title="تثبيت التطبيق" hidden>
+      <button type="button" class="social-btn social-btn-install" id="installIosBtn" aria-label="تثبيت التطبيق على آيفون" title="تثبيت التطبيق">
         <img src="./img/icon-apple-gold.png" alt="" width="17" height="21" decoding="async">
       </button>
     </nav>

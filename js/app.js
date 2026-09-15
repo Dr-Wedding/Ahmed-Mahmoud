@@ -10,6 +10,7 @@
   const BUSINESS_WHATSAPP = "201111714320";
 
   const PACKAGES_JSON_PATH = "./data/packages.json";
+  const BOOKED_DATES_JSON_PATH = "./data/booked-dates.json";
 
   /** حالة الحجز بالكامل */
   const bookingState = {
@@ -26,6 +27,7 @@
   /** بيانات محملة من JSON */
   let locationsData = [];
   let packagesData = [];
+  let bookedDatesSet = new Set();
   let currentStep = 1;
   let openPackageId = null;
   const packageCardEls = new Map(); // packageId -> { card, header }
@@ -209,6 +211,23 @@
     els.bookingDate.min = `${yyyy}-${mm}-${dd}`;
   }
 
+  // نحمّل قائمة التواريخ المحجوزة مسبقًا (اختياري وغير حرج لعمل
+  // الموقع). عدّل ملف data/booked-dates.json بإضافة أي تاريخ بصيغة
+  // YYYY-MM-DD عشان يتمنع اختياره في الخطوة الأولى
+  async function loadBookedDates() {
+    try {
+      const response = await fetch(BOOKED_DATES_JSON_PATH);
+      if (!response.ok) return;
+      const json = await response.json();
+      if (json && Array.isArray(json.bookedDates)) {
+        bookedDatesSet = new Set(json.bookedDates);
+      }
+    } catch (err) {
+      // فشل تحميل التواريخ المحجوزة لا يجب أن يعطّل الحجز نفسه
+      console.error("تعذر تحميل التواريخ المحجوزة:", err);
+    }
+  }
+
   // ------------------------------------------------------
   // Step 1 — إرسال النموذج
   // ------------------------------------------------------
@@ -227,6 +246,11 @@
 
     const result = validateBookingForm(formData);
     clearAllFieldErrors();
+
+    if (result.isValid && bookedDatesSet.has(formData.bookingDate)) {
+      result.isValid = false;
+      result.errors.bookingDate = "للأسف هذا التاريخ محجوز بالفعل، يرجى اختيار تاريخ آخر";
+    }
 
     if (!result.isValid) {
       const fieldMap = {
@@ -915,6 +939,7 @@
     window.addEventListener("appinstalled", () => {
       deferredInstallPrompt = null;
       if (els.installAppBtn) els.installAppBtn.hidden = true;
+      if (els.installIosBtn) els.installIosBtn.hidden = true;
     });
 
     initAndroidInstallButton();
@@ -922,18 +947,22 @@
   }
 
   // ------------------------------------------------------
-  // زر تثبيت التطبيق على أندرويد — يظهر لأي متصفح على أندرويد
-  // (وليس فقط كروم)، لأن بعض المتصفحات مثل Samsung Internet
-  // وFirefox لا تطلق حدث beforeinstallprompt أبدًا. لو الحدث
-  // متوفر نستخدم نافذة التثبيت الرسمية بضغطة واحدة، ولو لم يكن
-  // متوفرًا نعرض إرشادات يدوية بديلة بنفس فلسفة زر آيفون
+  // زر تثبيت التطبيق على أندرويد — يظهر دائمًا بجانب أيقونات
+  // السوشيال ميديا على كل الأجهزة (زي زر آيفون بالظبط)، مش بس
+  // على أندرويد. لو الحدث الرسمي beforeinstallprompt متوفر (بعض
+  // متصفحات الديسكتوب وأندرويد المبنية على Chromium) نستخدمه
+  // للتثبيت المباشر بضغطة واحدة، ولو لم يتوفر نعرض إرشادات يدوية
+  // بديلة. الزر بيتخفي فقط لو التطبيق مثبّت بالفعل وشغّال كتطبيق
+  // مستقل، لأنه مفيش حاجة تتثبت وقتها
   // ------------------------------------------------------
 
   function initAndroidInstallButton() {
     if (!els.installAppBtn || !els.androidInstallModal) return;
-    if (isRunningAsInstalledApp()) return;
 
-    els.installAppBtn.hidden = false;
+    if (isRunningAsInstalledApp()) {
+      els.installAppBtn.hidden = true;
+      return;
+    }
 
     els.installAppBtn.addEventListener("click", async () => {
       if (deferredInstallPrompt) {
@@ -952,19 +981,25 @@
   }
 
   // ------------------------------------------------------
-  // زر تثبيت التطبيق على آيفون (سفاري لا يوفّر أي API لبدء
-  // التثبيت تلقائيًا، فنعرض إرشادات التثبيت اليدوي بخطوتين)
+  // زر تثبيت التطبيق على آيفون — يظهر دائمًا بجانب أيقونات
+  // السوشيال ميديا على كل الأجهزة، مش بس على آيفون (سفاري أصلًا
+  // لا يوفّر أي API لبدء التثبيت تلقائيًا على أي منصة، فنعرض
+  // إرشادات التثبيت اليدوي بخطوتين للجميع). الزر بيتخفي فقط لو
+  // التطبيق مثبّت بالفعل وشغّال كتطبيق مستقل
   // ------------------------------------------------------
 
   function initIosInstallButton() {
     if (!els.installIosBtn || !els.iosInstallModal) return;
-    if (isRunningAsInstalledApp()) return;
 
-    // نعرض الزر لأي متصفح على iOS، لكن لو لم يكن سفاري ننصح المستخدم
-    // بفتح الموقع في سفاري تحديدًا داخل نص الإرشادات
-    els.installIosBtn.hidden = false;
+    if (isRunningAsInstalledApp()) {
+      els.installIosBtn.hidden = true;
+      return;
+    }
 
-    if (!isSafariBrowser()) {
+    // لو الزائر فعلًا على آيفون/آيباد لكن مش شغّال سفاري (كروم أو
+    // فايرفوكس على iOS مثلًا)، ننصحه يفتح الموقع في سفاري تحديدًا
+    // داخل نص الإرشادات؛ غير كده بنسيب النص الافتراضي زي ما هو
+    if (isIosDevice() && !isSafariBrowser()) {
       const hint = document.getElementById("iosModalHint");
       if (hint) {
         hint.textContent = "متصفحك الحالي لا يدعم التثبيت على الشاشة الرئيسية — افتح هذا الموقع في متصفح Safari أولًا، ثم اتبع الخطوتين التاليتين:";
@@ -981,6 +1016,7 @@
 
   function init() {
     initMinDate();
+    loadBookedDates();
     restoreDraftIfAny();
     goToStep(1);
     initLocations().then(resumeFromPendingDraft);
