@@ -74,10 +74,20 @@
     stickyCta: document.getElementById("stickyCta"),
     stickyCtaLabel: document.getElementById("stickyCtaLabel"),
     stickyCtaPrice: document.getElementById("stickyCtaPrice"),
-    confirmWhatsappBtn: document.getElementById("confirmWhatsappBtn"),
+    continueBookingBtn: document.getElementById("continueBookingBtn"),
 
     summaryCard: document.getElementById("summaryCard"),
     backToStep2: document.getElementById("backToStep2"),
+
+    walletBtns: document.querySelectorAll("[data-wallet]"),
+    bookViaWhatsappBtn: document.getElementById("bookViaWhatsappBtn"),
+    paymentModal: document.getElementById("paymentModal"),
+    paymentModalClose: document.getElementById("paymentModalClose"),
+    paymentModalTitle: document.getElementById("paymentModalTitle"),
+    paymentModalNumber: document.getElementById("paymentModalNumber"),
+    paymentModalCopyBtn: document.getElementById("paymentModalCopyBtn"),
+    paymentModalAmount: document.getElementById("paymentModalAmount"),
+    paymentModalConfirmBtn: document.getElementById("paymentModalConfirmBtn"),
 
     toast: document.getElementById("toast")
   };
@@ -566,14 +576,14 @@
 
     if (!pkg) {
       els.stickyCta.hidden = true;
-      els.confirmWhatsappBtn.disabled = true;
+      els.continueBookingBtn.disabled = true;
       return;
     }
 
     els.stickyCta.hidden = currentStep !== 2;
     els.stickyCtaLabel.textContent = `الباكدج المختارة: ${pkg.name}`;
     els.stickyCtaPrice.textContent = `${formatPrice(pkg.price)} ${pkg.currency}`;
-    els.confirmWhatsappBtn.disabled = false;
+    els.continueBookingBtn.disabled = false;
   }
 
   // ------------------------------------------------------
@@ -670,7 +680,7 @@
     }).format(date);
   }
 
-  function buildWhatsappMessage() {
+  function buildWhatsappMessage(paymentInfo) {
     const pkg = bookingState.selectedPackage;
     const { governorateName, cityName } = getLocationNames(
       locationsData,
@@ -679,6 +689,13 @@
     );
 
     const featuresText = pkg.features.map((f) => `- ${f}`).join("\n");
+
+    const paymentText = paymentInfo
+      ? `طريقة الدفع\n` +
+        `تم التحويل عبر: ${paymentInfo.methodLabel}\n` +
+        `إلى رقم المحفظة: ${paymentInfo.number}\n` +
+        `(برجاء تأكيد استلام التحويل)\n\n`
+      : "";
 
     const message =
       `حجز سيشن زفاف جديد\n\n` +
@@ -693,12 +710,24 @@
       `اسم الباكدج: ${pkg.name}\n` +
       `الخدمات:\n${featuresText}\n\n` +
       `السعر الإجمالي: ${formatPrice(pkg.price)} ${pkg.currency}\n\n` +
+      paymentText +
       `تم إرسال الطلب من موقع حجز سيشن الزفاف.`;
 
     return message;
   }
 
-  els.confirmWhatsappBtn.addEventListener("click", () => {
+  function openWhatsappWith(paymentInfo) {
+    const message = buildWhatsappMessage(paymentInfo);
+    const whatsappUrl = `https://wa.me/${BUSINESS_WHATSAPP}?text=${encodeURIComponent(message)}`;
+    window.open(whatsappUrl, "_blank");
+  }
+
+  // ------------------------------------------------------
+  // Step 3 — زر "متابعة الحجز": ينقل لصفحة الملخص واختيار
+  // طريقة الدفع، بدون فتح واتساب مباشرة
+  // ------------------------------------------------------
+
+  els.continueBookingBtn.addEventListener("click", () => {
     if (!bookingState.selectedPackage) {
       showToast("يرجى اختيار باكدج أولًا");
       return;
@@ -707,10 +736,112 @@
     renderSummary();
     goToStep(3);
     els.stickyCta.hidden = true;
+  });
 
-    const message = buildWhatsappMessage();
-    const whatsappUrl = `https://wa.me/${BUSINESS_WHATSAPP}?text=${encodeURIComponent(message)}`;
-    window.open(whatsappUrl, "_blank");
+  // ------------------------------------------------------
+  // Step 3 — الحجز المباشر عبر واتساب بدون دفع مسبق
+  // ------------------------------------------------------
+
+  els.bookViaWhatsappBtn.addEventListener("click", () => {
+    openWhatsappWith(null);
+  });
+
+  // ------------------------------------------------------
+  // Step 3 — الدفع عبر المحافظ الإلكترونية (فودافون كاش /
+  // اتصالات كاش / أورانج كاش / إنستاباي). كل الطرق الأربع بترسل
+  // على نفس الرقم، ونعرض نفس النافذة لكل منها مع تغيير العنوان
+  // والمبلغ فقط. لا يوجد أي بوابة دفع فعلية مربوطة (الموقع ثابت
+  // بدون سيرفر)؛ الزائر بيحوّل يدويًا من تطبيق المحفظة، وبعدين
+  // بيأكد الحجز عبر واتساب فيتأكد صاحب الموقع من التحويل بنفسه
+  // ------------------------------------------------------
+
+  const WALLET_NUMBER = "01111714320";
+  const WALLET_LABELS = {
+    vodafone: "فودافون كاش",
+    etisalat: "اتصالات كاش",
+    orange: "أورانج كاش",
+    instapay: "إنستاباي"
+  };
+
+  // اتصالات كاش وأورانج كاش أكوادهم قوائم تفاعلية (بتطلب الرقم السري
+  // ثم المبلغ ثم رقم المستلم خطوة بخطوة)، على عكس فودافون كاش اللي
+  // كوده بيدمج الرقم والمبلغ في نفس السطر. فمفيش طريقة تقنية نحط
+  // بيها الرقم والمبلغ جاهزين في كودهم، فأقصى تسهيل ممكن: نفتح
+  // الكود المباشر المختصر بتاعهم، ونعمل نسخ تلقائي لرقم المصوّر
+  // عشان يلصقه بس لما القائمة تطلب رقم المستلم
+  const MENU_USSD_CODES = {
+    etisalat: "*777*1#",
+    orange: "#115#"
+  };
+
+  // نرمّز علامة # فقط (بتتحول لجزء Fragment في الرابط لو اتسابت
+  // من غير ترميز)؛ النجوم والأرقام مايحتاجوش ترميز
+  function dialUssd(code) {
+    window.location.href = `tel:${code.replace(/#/g, "%23")}`;
+  }
+
+  els.walletBtns.forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const wallet = btn.dataset.wallet;
+      const label = WALLET_LABELS[wallet];
+      const pkg = bookingState.selectedPackage;
+      if (!label || !pkg) return;
+
+      // فودافون كاش: كود واحد فيه الرقم والمبلغ جاهزين، بضغطة واحدة
+      if (wallet === "vodafone") {
+        dialUssd(`*9*7${WALLET_NUMBER}*${pkg.price}#`);
+        openWhatsappWith({ methodLabel: label, number: WALLET_NUMBER });
+        return;
+      }
+
+      // اتصالات كاش / أورانج كاش: ننسخ رقم المصوّر تلقائيًا عشان
+      // يلصقه في القائمة التفاعلية، ونفتح الكود المباشر المختصر
+      if (MENU_USSD_CODES[wallet]) {
+        try {
+          await navigator.clipboard.writeText(WALLET_NUMBER);
+          showToast("تم نسخ رقم المصوّر — الصقه لما القائمة تطلب رقم المستلم");
+        } catch (err) {
+          showToast(`رقم المصوّر: ${WALLET_NUMBER}`);
+        }
+        dialUssd(MENU_USSD_CODES[wallet]);
+        openWhatsappWith({ methodLabel: label, number: WALLET_NUMBER });
+        return;
+      }
+
+      // إنستاباي: مفيش كود اتصال لها أصلًا، فنعرض نافذة فيها رقم
+      // المصوّر مع زر نسخ بدل كود الاتصال
+      els.paymentModalNumber.textContent = WALLET_NUMBER;
+      els.paymentModalAmount.textContent = `المبلغ المطلوب: ${formatPrice(pkg.price)} ${pkg.currency}`;
+
+      // نستخدم onclick بدل addEventListener عشان نستبدل المعالج
+      // القديم بدل ما يتراكم معالج جديد في كل مرة يفتح فيها المستخدم
+      // النافذة
+      els.paymentModalConfirmBtn.onclick = () => {
+        openWhatsappWith({ methodLabel: label, number: WALLET_NUMBER });
+        closeModal(els.paymentModal);
+      };
+
+      openModal(els.paymentModal);
+    });
+  });
+
+  els.paymentModalCopyBtn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(WALLET_NUMBER);
+      showToast("تم نسخ الرقم");
+    } catch (err) {
+      showToast("تعذر نسخ الرقم، برجاء نسخه يدويًا");
+    }
+  });
+
+  els.paymentModalClose.addEventListener("click", () => closeModal(els.paymentModal));
+
+  els.paymentModal.addEventListener("click", (event) => {
+    if (event.target === els.paymentModal) closeModal(els.paymentModal);
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !els.paymentModal.hidden) closeModal(els.paymentModal);
   });
 
   // ------------------------------------------------------
