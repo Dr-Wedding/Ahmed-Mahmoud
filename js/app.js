@@ -28,6 +28,21 @@
   let locationsData = [];
   let packagesData = [];
   let bookedDatesSet = new Set();
+
+  /** إضافة تصوير البرومو الاختيارية — سعر ثابت فوق سعر الباكدج،
+   * وحالة الاختيار متتبعة لكل باكدج على حدة برقم الـ id بتاعها */
+  const PROMO_ADDON_PRICE = 2500;
+  const PROMO_ADDON_LABEL = "تصوير برومو";
+  let promoAddonSelections = {};
+
+  function hasPromoAddon(pkg) {
+    return Boolean(pkg && pkg.promoAddon && promoAddonSelections[pkg.id]);
+  }
+
+  function getEffectivePrice(pkg) {
+    if (!pkg) return 0;
+    return pkg.price + (hasPromoAddon(pkg) ? PROMO_ADDON_PRICE : 0);
+  }
   let currentStep = 1;
   let openPackageId = null;
   const packageCardEls = new Map(); // packageId -> { card, header }
@@ -487,7 +502,7 @@
 
       const priceEl = document.createElement("span");
       priceEl.className = "package-price";
-      priceEl.textContent = `${formatPrice(pkg.price)} ${pkg.currency}`;
+      priceEl.textContent = `${formatPrice(getEffectivePrice(pkg))} ${pkg.currency}`;
 
       titleWrap.appendChild(nameRow);
       titleWrap.appendChild(priceEl);
@@ -527,6 +542,36 @@
       selectBtn.textContent = "اختيار هذه الباكدج";
 
       body.appendChild(featuresList);
+
+      // تصوير برومو اختياري — مش متاح إلا للباكدجات اللي عندها
+      // promoAddon: true (باستثناء "ليلة العمر" لأنه شامل برومو
+      // ودرون أساسًا بدون اختيار)
+      if (pkg.promoAddon) {
+        const addonRow = document.createElement("label");
+        addonRow.className = "package-addon";
+
+        const addonCheckbox = document.createElement("input");
+        addonCheckbox.type = "checkbox";
+        addonCheckbox.className = "package-addon-checkbox";
+        addonCheckbox.checked = Boolean(promoAddonSelections[pkg.id]);
+
+        const addonText = document.createElement("span");
+        addonText.className = "package-addon-text";
+        addonText.textContent = `${PROMO_ADDON_LABEL} اختياري (+${formatPrice(PROMO_ADDON_PRICE)} ${pkg.currency})`;
+
+        addonCheckbox.addEventListener("change", () => {
+          promoAddonSelections[pkg.id] = addonCheckbox.checked;
+          priceEl.textContent = `${formatPrice(getEffectivePrice(pkg))} ${pkg.currency}`;
+          if (bookingState.selectedPackage && bookingState.selectedPackage.id === pkg.id) {
+            updateStickyCta();
+          }
+        });
+
+        addonRow.appendChild(addonCheckbox);
+        addonRow.appendChild(addonText);
+        body.appendChild(addonRow);
+      }
+
       body.appendChild(selectBtn);
       panelInner.appendChild(body);
       panel.appendChild(panelInner);
@@ -582,7 +627,7 @@
 
     els.stickyCta.hidden = currentStep !== 2;
     els.stickyCtaLabel.textContent = `الباكدج المختارة: ${pkg.name}`;
-    els.stickyCtaPrice.textContent = `${formatPrice(pkg.price)} ${pkg.currency}`;
+    els.stickyCtaPrice.textContent = `${formatPrice(getEffectivePrice(pkg))} ${pkg.currency}`;
     els.continueBookingBtn.disabled = false;
   }
 
@@ -637,6 +682,11 @@
       li.textContent = feature;
       featuresList.appendChild(li);
     });
+    if (hasPromoAddon(pkg)) {
+      const li = document.createElement("li");
+      li.textContent = `${PROMO_ADDON_LABEL} (إضافة اختيارية)`;
+      featuresList.appendChild(li);
+    }
     packageBlock.appendChild(featuresList);
 
     const totalRow = document.createElement("div");
@@ -646,7 +696,7 @@
     totalLabel.textContent = "السعر الإجمالي";
     const totalPrice = document.createElement("span");
     totalPrice.className = "summary-total-price";
-    totalPrice.textContent = `${formatPrice(pkg.price)} ${pkg.currency}`;
+    totalPrice.textContent = `${formatPrice(getEffectivePrice(pkg))} ${pkg.currency}`;
     totalRow.appendChild(totalLabel);
     totalRow.appendChild(totalPrice);
     packageBlock.appendChild(totalRow);
@@ -688,7 +738,10 @@
       bookingState.city
     );
 
-    const featuresText = pkg.features.map((f) => `- ${f}`).join("\n");
+    const featuresText = pkg.features
+      .concat(hasPromoAddon(pkg) ? [`${PROMO_ADDON_LABEL} (إضافة اختيارية)`] : [])
+      .map((f) => `- ${f}`)
+      .join("\n");
 
     const paymentText = paymentInfo
       ? `طريقة الدفع\n` +
@@ -709,7 +762,7 @@
       `الباكدج المختارة\n` +
       `اسم الباكدج: ${pkg.name}\n` +
       `الخدمات:\n${featuresText}\n\n` +
-      `السعر الإجمالي: ${formatPrice(pkg.price)} ${pkg.currency}\n\n` +
+      `السعر الإجمالي: ${formatPrice(getEffectivePrice(pkg))} ${pkg.currency}\n\n` +
       paymentText +
       `تم إرسال الطلب من موقع حجز سيشن الزفاف.`;
 
@@ -789,7 +842,7 @@
 
       // فودافون كاش: كود واحد فيه الرقم والمبلغ جاهزين، بضغطة واحدة
       if (wallet === "vodafone") {
-        dialUssd(`*9*7${WALLET_NUMBER}*${pkg.price}#`);
+        dialUssd(`*9*7${WALLET_NUMBER}*${getEffectivePrice(pkg)}#`);
         openWhatsappWith({ methodLabel: label, number: WALLET_NUMBER });
         return;
       }
@@ -811,7 +864,7 @@
       // إنستاباي: مفيش كود اتصال لها أصلًا، فنعرض نافذة فيها رقم
       // المصوّر مع زر نسخ بدل كود الاتصال
       els.paymentModalNumber.textContent = WALLET_NUMBER;
-      els.paymentModalAmount.textContent = `المبلغ المطلوب: ${formatPrice(pkg.price)} ${pkg.currency}`;
+      els.paymentModalAmount.textContent = `المبلغ المطلوب: ${formatPrice(getEffectivePrice(pkg))} ${pkg.currency}`;
 
       // نستخدم onclick بدل addEventListener عشان نستبدل المعالج
       // القديم بدل ما يتراكم معالج جديد في كل مرة يفتح فيها المستخدم
