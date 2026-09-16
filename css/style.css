@@ -1012,6 +1012,24 @@ body {
   filter: brightness(1.08);
 }
 
+.btn-wallet-icon {
+  flex-shrink: 0;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border-radius: 5px;
+  padding: 3px 5px;
+}
+
+.btn-wallet-icon img {
+  height: 100%;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
+
 .payment-modal-number-row {
   display: flex;
   align-items: center;

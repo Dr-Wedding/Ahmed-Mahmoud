@@ -12,7 +12,7 @@
 // الشبكة في الخلفية، وبعدها js/app.js بيعمل Reload تلقائي وصامت
 // لأي تبويب مفتوح بالفعل — الزائر يشوف آخر نسخة من غير أي تدخل
 // يدوي منه، وبدون ما يضيع أي بيانات كان بيكتبها في الفورم.
-const CACHE_VERSION = "v15";
+const CACHE_VERSION = "v16";
 const CACHE_NAME = `am-photography-${CACHE_VERSION}`;
 
 // ملفات الهيكل الأساسي للموقع (نادرًا ما تتغيّر) — كاش أولًا لسرعة فورية،
@@ -27,6 +27,10 @@ const APP_SHELL = [
   "./js/locations.js",
   "./img/logo-gold.png",
   "./img/logo-gold.webp",
+  "./img/icon-vodafone.png",
+  "./img/icon-etisalat.png",
+  "./img/icon-orange.png",
+  "./img/icon-instapay.png",
   "./img/icon-whatsapp.png",
   "./img/icon-android-gold.png",
   "./img/icon-apple-gold.png",
