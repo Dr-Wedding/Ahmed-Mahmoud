@@ -821,20 +821,7 @@
   const WALLET_NUMBER = "01111714320";
   const WALLET_LABELS = {
     vodafone: "فودافون كاش",
-    etisalat: "اتصالات كاش",
-    orange: "أورانج كاش",
     instapay: "إنستاباي"
-  };
-
-  // اتصالات كاش وأورانج كاش أكوادهم قوائم تفاعلية (بتطلب الرقم السري
-  // ثم المبلغ ثم رقم المستلم خطوة بخطوة)، على عكس فودافون كاش اللي
-  // كوده بيدمج الرقم والمبلغ في نفس السطر. فمفيش طريقة تقنية نحط
-  // بيها الرقم والمبلغ جاهزين في كودهم، فأقصى تسهيل ممكن: نفتح
-  // الكود المباشر المختصر بتاعهم، ونعمل نسخ تلقائي لرقم المصوّر
-  // عشان يلصقه بس لما القائمة تطلب رقم المستلم
-  const MENU_USSD_CODES = {
-    etisalat: "*777*1#",
-    orange: "#115#"
   };
 
   // نرمّز علامة # فقط (بتتحول لجزء Fragment في الرابط لو اتسابت
@@ -844,7 +831,7 @@
   }
 
   els.walletBtns.forEach((btn) => {
-    btn.addEventListener("click", async () => {
+    btn.addEventListener("click", () => {
       const wallet = btn.dataset.wallet;
       const label = WALLET_LABELS[wallet];
       const pkg = bookingState.selectedPackage;
@@ -853,20 +840,6 @@
       // فودافون كاش: كود واحد فيه الرقم والمبلغ جاهزين، بضغطة واحدة
       if (wallet === "vodafone") {
         dialUssd(`*9*7${WALLET_NUMBER}*${getEffectivePrice(pkg)}#`);
-        openWhatsappWith({ methodLabel: label, number: WALLET_NUMBER });
-        return;
-      }
-
-      // اتصالات كاش / أورانج كاش: ننسخ رقم المصوّر تلقائيًا عشان
-      // يلصقه في القائمة التفاعلية، ونفتح الكود المباشر المختصر
-      if (MENU_USSD_CODES[wallet]) {
-        try {
-          await navigator.clipboard.writeText(WALLET_NUMBER);
-          showToast("تم نسخ رقم المصوّر — الصقه لما القائمة تطلب رقم المستلم");
-        } catch (err) {
-          showToast(`رقم المصوّر: ${WALLET_NUMBER}`);
-        }
-        dialUssd(MENU_USSD_CODES[wallet]);
         openWhatsappWith({ methodLabel: label, number: WALLET_NUMBER });
         return;
       }

@@ -664,6 +664,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-direction: row-reverse;
   justify-content: flex-end;
   background: var(--bg-elevated-2);
   border: 1px solid var(--line);
@@ -1021,14 +1022,6 @@ body {
 
 .btn-vodafone {
   background: #e60000;
-}
-
-.btn-etisalat {
-  background: #1a8a3d;
-}
-
-.btn-orange {
-  background: #f56a00;
 }
 
 .btn-instapay {
