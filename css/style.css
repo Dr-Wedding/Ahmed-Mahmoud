@@ -961,6 +961,105 @@ body {
 }
 
 /* =========================================================
+   Payment options (Step 3)
+   ========================================================= */
+.payment-section {
+  margin-top: 24px;
+}
+
+.payment-section-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--ivory);
+  margin: 0 0 6px;
+}
+
+.payment-section-hint {
+  color: var(--ivory-dim);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin: 0 0 16px;
+}
+
+.payment-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btn-wallet {
+  color: #fff;
+}
+
+.btn-vodafone {
+  background: #e60000;
+}
+
+.btn-etisalat {
+  background: #1a8a3d;
+}
+
+.btn-orange {
+  background: #f56a00;
+}
+
+.btn-instapay {
+  background: #1f3fa3;
+}
+
+.btn-wallet:hover {
+  filter: brightness(1.08);
+}
+
+.payment-modal-number-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: var(--bg-elevated-2);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  margin-bottom: 14px;
+}
+
+.payment-modal-number {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--gold-light);
+  direction: ltr;
+  unicode-bidi: embed;
+}
+
+.payment-modal-copy {
+  flex-shrink: 0;
+  background: transparent;
+  border: 1px solid var(--line-strong);
+  color: var(--ivory-dim);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.payment-modal-copy:hover {
+  color: var(--ivory);
+  border-color: var(--gold);
+}
+
+.payment-modal-amount {
+  color: var(--ivory);
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 20px;
+}
+
+/* =========================================================
    Responsive
    ========================================================= */
 @media (min-width: 640px) {
