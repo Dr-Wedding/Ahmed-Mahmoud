@@ -108,6 +108,7 @@
   };
 
   const priceFormatter = new Intl.NumberFormat("ar-EG");
+  const priceFormatterNoGroup = new Intl.NumberFormat("ar-EG", { useGrouping: false });
 
   // ------------------------------------------------------
   // أدوات مساعدة عامة
@@ -115,6 +116,10 @@
 
   function formatPrice(amount) {
     return priceFormatter.format(amount);
+  }
+
+  function formatPriceNoGroup(amount) {
+    return priceFormatterNoGroup.format(amount);
   }
 
   let toastTimer = null;
@@ -167,7 +172,7 @@
       }
     });
 
-    els.stickyCta.hidden = stepNumber !== 2 || !bookingState.selectedPackage;
+    els.stickyCta.hidden = stepNumber !== 1 || !bookingState.selectedPackage;
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -254,11 +259,17 @@
   }
 
   // ------------------------------------------------------
-  // Step 1 — إرسال النموذج
+  // Step 2 — إرسال النموذج (بعد اختيار الباكدج في الخطوة الأولى)
   // ------------------------------------------------------
 
   els.form.addEventListener("submit", (event) => {
     event.preventDefault();
+
+    if (!bookingState.selectedPackage) {
+      showToast("يرجى اختيار باكدج أولًا");
+      goToStep(1);
+      return;
+    }
 
     const formData = {
       groomName: els.groomName.value,
@@ -307,8 +318,8 @@
 
     Object.assign(bookingState, formData);
 
-    goToStep(2);
-    ensurePackagesLoaded();
+    renderSummary();
+    goToStep(3);
   });
 
   els.backToStep1.addEventListener("click", () => goToStep(1));
@@ -447,7 +458,7 @@
     }
     updateStickyCta();
 
-    if (currentStep === 2) {
+    if (currentStep === 1) {
       showToast(
         previousSelectedId && !stillSelectedPkg
           ? "تم تحديث الباكدجات، وللأسف الباكدج اللي اخترتها لم تعد متاحة"
@@ -557,7 +568,7 @@
 
         const addonText = document.createElement("span");
         addonText.className = "package-addon-text";
-        addonText.textContent = `${PROMO_ADDON_LABEL} اختياري (+${formatPrice(PROMO_ADDON_PRICE)} ${pkg.currency})`;
+        addonText.textContent = `${PROMO_ADDON_LABEL} ${formatPriceNoGroup(PROMO_ADDON_PRICE)} ${pkg.currency}`;
 
         addonCheckbox.addEventListener("change", () => {
           promoAddonSelections[pkg.id] = addonCheckbox.checked;
@@ -625,7 +636,7 @@
       return;
     }
 
-    els.stickyCta.hidden = currentStep !== 2;
+    els.stickyCta.hidden = currentStep !== 1;
     els.stickyCtaLabel.textContent = `الباكدج المختارة: ${pkg.name}`;
     els.stickyCtaPrice.textContent = `${formatPrice(getEffectivePrice(pkg))} ${pkg.currency}`;
     els.continueBookingBtn.disabled = false;
@@ -776,8 +787,8 @@
   }
 
   // ------------------------------------------------------
-  // Step 3 — زر "متابعة الحجز": ينقل لصفحة الملخص واختيار
-  // طريقة الدفع، بدون فتح واتساب مباشرة
+  // Step 1 — زر "متابعة الحجز": بعد اختيار الباكدج، ينقل لصفحة
+  // بيانات الحجز (الخطوة الثانية)
   // ------------------------------------------------------
 
   els.continueBookingBtn.addEventListener("click", () => {
@@ -786,8 +797,7 @@
       return;
     }
 
-    renderSummary();
-    goToStep(3);
+    goToStep(2);
     els.stickyCta.hidden = true;
   });
 
@@ -1035,11 +1045,9 @@
 
     const targetStep = pendingDraft.currentStep || 1;
 
-    if (targetStep >= 2) {
-      await ensurePackagesLoaded();
-      if (pendingDraft.selectedPackageId) {
-        selectPackage(pendingDraft.selectedPackageId);
-      }
+    if (pendingDraft.selectedPackageId) {
+      await ensurePackagesLoaded(); // آمن الاستدعاء حتى لو اتحمّلت بالفعل من init()
+      selectPackage(pendingDraft.selectedPackageId);
     }
 
     if (targetStep >= 3 && bookingState.selectedPackage) {
@@ -1203,6 +1211,7 @@
     loadBookedDates();
     restoreDraftIfAny();
     goToStep(1);
+    ensurePackagesLoaded();
     initLocations().then(resumeFromPendingDraft);
     registerServiceWorker();
     initInstallPrompt();

@@ -84,11 +84,11 @@
     <ol class="progress-steps" id="progressSteps">
       <li class="progress-step is-active" data-step="1">
         <span class="progress-dot" aria-hidden="true">١</span>
-        <span class="progress-label">بيانات الحجز</span>
+        <span class="progress-label">اختيار الباكدج</span>
       </li>
       <li class="progress-step" data-step="2">
         <span class="progress-dot" aria-hidden="true">٢</span>
-        <span class="progress-label">اختيار الباكدج</span>
+        <span class="progress-label">بيانات الحجز</span>
       </li>
       <li class="progress-step" data-step="3">
         <span class="progress-dot" aria-hidden="true">٣</span>
@@ -101,11 +101,21 @@
 
     <!-- ================= STEP 1 ================= -->
     <section class="step" id="step1" data-step-panel="1" aria-labelledby="step1-title">
+      <h2 id="step1-title" class="section-title section-title-lg">باكدجات الزفاف</h2>
+      <p class="section-hint">اختر باكدج واحدة تناسب يوم فرحك</p>
+
+      <p class="packages-status" id="packagesStatus" role="status"></p>
+
+      <div class="accordion" id="packagesAccordion"></div>
+    </section>
+
+    <!-- ================= STEP 2 ================= -->
+    <section class="step" id="step2" data-step-panel="2" hidden aria-labelledby="step2-title">
 
       <form id="bookingForm" novalidate>
 
         <div class="field-group">
-          <h2 id="step1-title" class="section-title">بيانات العريس</h2>
+          <h2 id="step2-title" class="section-title">بيانات العريس</h2>
 
           <div class="field">
             <label for="groomName">اسم العريس ثلاثي</label>
@@ -168,19 +178,9 @@
         </button>
 
       </form>
-    </section>
-
-    <!-- ================= STEP 2 ================= -->
-    <section class="step" id="step2" data-step-panel="2" hidden aria-labelledby="step2-title">
-      <h2 id="step2-title" class="section-title section-title-lg">باكدجات الزفاف</h2>
-      <p class="section-hint">اختر باكدج واحدة تناسب يوم فرحك</p>
-
-      <p class="packages-status" id="packagesStatus" role="status"></p>
-
-      <div class="accordion" id="packagesAccordion"></div>
 
       <div class="step2-actions">
-        <button type="button" class="btn btn-ghost" id="backToStep1">رجوع لبيانات الحجز</button>
+        <button type="button" class="btn btn-ghost" id="backToStep1">رجوع لاختيار الباكدج</button>
       </div>
     </section>
 
@@ -223,7 +223,7 @@
       </div>
 
       <div class="step3-actions">
-        <button type="button" class="btn btn-ghost" id="backToStep2">تعديل الباكدج</button>
+        <button type="button" class="btn btn-ghost" id="backToStep2">تعديل البيانات</button>
       </div>
     </section>
 
