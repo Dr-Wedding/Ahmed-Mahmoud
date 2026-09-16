@@ -23,7 +23,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Ahmed Mahmoud">
+<meta name="apple-mobile-web-app-title" content="A.M PH">
 <link rel="icon" href="./img/icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="./img/apple-touch-icon.png">
 
@@ -191,6 +191,25 @@
 
       <div class="summary-card" id="summaryCard"></div>
 
+      <div class="payment-section">
+        <h3 class="payment-section-title">اختر طريقة الحجز</h3>
+        <p class="payment-section-hint">حوّل المبلغ عبر إحدى المحافظ الإلكترونية التالية ثم أكّد الحجز، أو احجز مباشرة عبر واتساب بدون دفع مسبق</p>
+
+        <div class="payment-options">
+          <button type="button" class="btn btn-block btn-wallet btn-vodafone" data-wallet="vodafone">الدفع عبر فودافون كاش</button>
+          <button type="button" class="btn btn-block btn-wallet btn-etisalat" data-wallet="etisalat">الدفع عبر اتصالات كاش</button>
+          <button type="button" class="btn btn-block btn-wallet btn-orange" data-wallet="orange">الدفع عبر أورانج كاش</button>
+          <button type="button" class="btn btn-block btn-wallet btn-instapay" data-wallet="instapay">الدفع عبر إنستاباي</button>
+
+          <button type="button" class="btn btn-block btn-whatsapp" id="bookViaWhatsappBtn">
+            <svg viewBox="0 0 32 32" width="20" height="20" aria-hidden="true" fill="currentColor">
+              <path d="M16.02 3C9.4 3 4 8.37 4 14.98c0 2.13.56 4.13 1.63 5.9L4 29l8.28-1.6a12.9 12.9 0 0 0 3.74.55h.01c6.62 0 12.02-5.37 12.02-11.98C28.05 8.37 22.65 3 16.02 3Zm0 21.9h-.01c-1.9 0-3.75-.5-5.37-1.44l-.38-.23-4.9.95.96-4.78-.25-.4a9.9 9.9 0 0 1-1.53-5.02C4.54 8.97 9.02 4.5 16.02 4.5c3.4 0 6.6 1.32 9 3.73a12.6 12.6 0 0 1 3.73 8.75c0 6.03-4.94 10.92-10.98 10.92h-.75Zm5.98-8.2c-.33-.16-1.93-.95-2.23-1.06-.3-.11-.51-.16-.73.16-.22.33-.84 1.06-1.03 1.27-.19.22-.38.24-.7.08-.33-.16-1.36-.5-2.6-1.6-.96-.86-1.6-1.92-1.79-2.24-.19-.33-.02-.5.14-.67.14-.14.33-.38.49-.57.16-.19.22-.33.33-.55.11-.22.05-.41-.03-.57-.08-.16-.73-1.76-1-2.41-.26-.63-.53-.55-.73-.56h-.62c-.22 0-.57.08-.87.4-.3.33-1.13 1.1-1.13 2.7 0 1.6 1.16 3.14 1.32 3.36.16.22 2.28 3.48 5.53 4.88.77.33 1.37.53 1.84.68.77.25 1.47.21 2.03.13.62-.09 1.93-.79 2.2-1.55.27-.76.27-1.42.19-1.55-.08-.14-.3-.22-.62-.38Z"/>
+            </svg>
+            الحجز عبر واتساب مباشرة
+          </button>
+        </div>
+      </div>
+
       <div class="step3-actions">
         <button type="button" class="btn btn-ghost" id="backToStep2">تعديل الباكدج</button>
       </div>
@@ -209,11 +228,9 @@
         <span class="sticky-cta-label" id="stickyCtaLabel"></span>
         <span class="sticky-cta-price" id="stickyCtaPrice"></span>
       </div>
-      <button type="button" class="btn btn-whatsapp" id="confirmWhatsappBtn" disabled>
-        <svg viewBox="0 0 32 32" width="20" height="20" aria-hidden="true" fill="currentColor">
-          <path d="M16.02 3C9.4 3 4 8.37 4 14.98c0 2.13.56 4.13 1.63 5.9L4 29l8.28-1.6a12.9 12.9 0 0 0 3.74.55h.01c6.62 0 12.02-5.37 12.02-11.98C28.05 8.37 22.65 3 16.02 3Zm0 21.9h-.01c-1.9 0-3.75-.5-5.37-1.44l-.38-.23-4.9.95.96-4.78-.25-.4a9.9 9.9 0 0 1-1.53-5.02C4.54 8.97 9.02 4.5 16.02 4.5c3.4 0 6.6 1.32 9 3.73a12.6 12.6 0 0 1 3.73 8.75c0 6.03-4.94 10.92-10.98 10.92h-.75Zm5.98-8.2c-.33-.16-1.93-.95-2.23-1.06-.3-.11-.51-.16-.73.16-.22.33-.84 1.06-1.03 1.27-.19.22-.38.24-.7.08-.33-.16-1.36-.5-2.6-1.6-.96-.86-1.6-1.92-1.79-2.24-.19-.33-.02-.5.14-.67.14-.14.33-.38.49-.57.16-.19.22-.33.33-.55.11-.22.05-.41-.03-.57-.08-.16-.73-1.76-1-2.41-.26-.63-.53-.55-.73-.56h-.62c-.22 0-.57.08-.87.4-.3.33-1.13 1.1-1.13 2.7 0 1.6 1.16 3.14 1.32 3.36.16.22 2.28 3.48 5.53 4.88.77.33 1.37.53 1.84.68.77.25 1.47.21 2.03.13.62-.09 1.93-.79 2.2-1.55.27-.76.27-1.42.19-1.55-.08-.14-.3-.22-.62-.38Z"/>
-        </svg>
-        تأكيد الحجز عبر واتساب
+      <button type="button" class="btn btn-primary" id="continueBookingBtn" disabled>
+        متابعة الحجز
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </div>
   </div>
@@ -276,6 +293,29 @@
       </ol>
 
       <button type="button" class="btn btn-primary btn-block" id="androidModalGotIt">تمام، فهمت</button>
+    </div>
+  </div>
+
+  <!-- نافذة الدفع عبر المحافظ الإلكترونية — نفس النافذة تُستخدم للطرق
+       الأربع (فودافون كاش / اتصالات كاش / أورانج كاش / إنستاباي)
+       ويتغيّر عنوانها ومبلغها عبر JS حسب الطريقة المختارة -->
+  <div class="install-modal-backdrop" id="paymentModal" hidden>
+    <div class="install-modal" role="dialog" aria-modal="true" aria-labelledby="paymentModalTitle">
+      <button type="button" class="install-modal-close" id="paymentModalClose" aria-label="إغلاق">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+      </button>
+
+      <h2 id="paymentModalTitle" class="install-modal-title">الدفع عبر إنستاباي</h2>
+      <p class="install-modal-hint">حوّل المبلغ المطلوب إلى رقم إنستاباي الخاص بالمصوّر، ثم اضغط الزر أدناه لتأكيد الحجز عبر واتساب:</p>
+
+      <div class="payment-modal-number-row">
+        <span class="payment-modal-number" id="paymentModalNumber">01111714320</span>
+        <button type="button" class="payment-modal-copy" id="paymentModalCopyBtn">نسخ رقم المصوّر</button>
+      </div>
+
+      <p class="payment-modal-amount" id="paymentModalAmount"></p>
+
+      <button type="button" class="btn btn-primary btn-block" id="paymentModalConfirmBtn">تم التحويل، تأكيد الحجز عبر واتساب</button>
     </div>
   </div>
 
