@@ -12,7 +12,7 @@
 // الشبكة في الخلفية، وبعدها js/app.js بيعمل Reload تلقائي وصامت
 // لأي تبويب مفتوح بالفعل — الزائر يشوف آخر نسخة من غير أي تدخل
 // يدوي منه، وبدون ما يضيع أي بيانات كان بيكتبها في الفورم.
-const CACHE_VERSION = "v21";
+const CACHE_VERSION = "v22";
 const CACHE_NAME = `am-photography-${CACHE_VERSION}`;
 
 // ملفات الهيكل الأساسي للموقع (نادرًا ما تتغيّر) — كاش أولًا لسرعة فورية،
@@ -35,6 +35,7 @@ const APP_SHELL = [
   "./img/icon-facebook.png",
   "./img/icon-tiktok.png",
   "./img/icon-192.png",
+  "./favicon.ico",
   "./img/icon-512.png",
   "./img/icon-maskable-512.png",
   "./img/apple-touch-icon.png"
